@@ -4,7 +4,12 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/Users/leandrorocha/USJT/Programação%20de%20soluções%20computacionais/Cristiane/View/src/util/ThemeManager.java</file>
-            <file>file:/Users/leandrorocha/USJT/Programação%20de%20soluções%20computacionais/Cristiane/View/src/view/DashboardView.java</file>
+            <file>file:/Users/leandrorocha/USJT/Programação%20de%20soluções%20computacionais/Cristiane/View/src/view/ManagerMainView.java</file>
+            <file>file:/Users/leandrorocha/USJT/Programação%20de%20soluções%20computacionais/Cristiane/View/src/view/View.java</file>
+            <file>file:/Users/leandrorocha/USJT/Programação%20de%20soluções%20computacionais/Cristiane/View/src/view/LoginView.java</file>
+            <file>file:/Users/leandrorocha/USJT/Programação%20de%20soluções%20computacionais/Cristiane/View/src/controller/ManagerController.java</file>
+            <file>file:/Users/leandrorocha/USJT/Programação%20de%20soluções%20computacionais/Cristiane/View/src/view/InvestorRegistrationOptimizationView.java</file>
+            <file>file:/Users/leandrorocha/USJT/Programação%20de%20soluções%20computacionais/Cristiane/View/src/controller/InvestorController.java</file>
         </group>
     </open-files>
 </project-private>

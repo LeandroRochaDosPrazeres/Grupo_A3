@@ -1,11 +1,14 @@
 package controller;
 
 import view.ManagerMainView;
-import view.InvestorRegistrationOptimizationView; // Importa a nova view de cadastro
+import view.InvestorRegistrationOptimizationView; 
+import view.ManagerInvestorHistoryView; // ESTA LINHA RESOLVE O ERRO!
+
 /**
  *
  * @author leandrorocha
  */
+
 public class ManagerController {
 
     private ManagerMainView managerMainView;
@@ -17,7 +20,7 @@ public class ManagerController {
     // --- MÉTODOS CONTRATUAIS DA JORNADA DO GERENTE ---
 
     public void openNewInvestorFlow() {
-        // 1. Instancia a tela de cadastro (o JPanel que acabamos de criar)
+        // 1. Instancia a tela de cadastro (o JPanel que criamos)
         InvestorRegistrationOptimizationView cadastroView = new InvestorRegistrationOptimizationView();
         
         // 2. Cria o controlador específico para cuidar das ações dela
@@ -30,7 +33,16 @@ public class ManagerController {
     }
 
     public void openInvestorHistory() {
-        System.out.println("Controller: Abrindo histórico de investidores...");
+        // 1. Instancia a tela de histórico
+        ManagerInvestorHistoryView historicoView = new ManagerInvestorHistoryView();
+        
+        // 2. Cria e vincula o controlador dela
+        InvestorController investorController = new InvestorController(historicoView);
+        historicoView.setController(investorController);
+        
+        // 3. Substitui o painel dinâmico da tela principal pelo histórico
+        managerMainView.showPanel(historicoView);
+        System.out.println("Controller: Painel de histórico de investidores injetado com sucesso.");
     }
 
     public void logout() {

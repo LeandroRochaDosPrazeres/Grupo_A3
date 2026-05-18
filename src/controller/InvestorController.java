@@ -1,18 +1,26 @@
 package controller;
 
-import view.InvestorRegistrationOptimizationView; // Importação crucial
-
+import view.InvestorRegistrationOptimizationView;
+import view.ManagerInvestorHistoryView; // Importação adicionada para a tela de histórico
 /**
  *
  * @author leandrorocha
  */
 
+
 public class InvestorController {
 
     private InvestorRegistrationOptimizationView registrationView;
+    private ManagerInvestorHistoryView historyView; // Atributo adicionado para gerir o histórico
 
+    // Construtor 1: Vinculado à tela de Cadastro/Otimização
     public InvestorController(InvestorRegistrationOptimizationView registrationView) {
         this.registrationView = registrationView;
+    }
+
+    // Construtor 2: Vinculado à tela de Histórico (Resolve o erro do ManagerController)
+    public InvestorController(ManagerInvestorHistoryView historyView) {
+        this.historyView = historyView;
     }
 
     public void registerAndOptimize() {
