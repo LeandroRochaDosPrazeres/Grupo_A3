@@ -18,7 +18,7 @@ public class LoginView extends javax.swing.JFrame {
     private JPasswordField txtPassword;
     private JButton btnLogin;
     private JButton btnThemeToggle;
-    private JLabel lblLogo; // Substitui o lblTitulo
+    private JLabel lblLogo; 
     private JPanel loginCard;
 
     public LoginView() {
@@ -29,11 +29,26 @@ public class LoginView extends javax.swing.JFrame {
         this.controller = controller;
     }
 
-    // --- MÉTODOS OBRIGATÓRIOS DA VIEW ---
-    public void showView() { this.setVisible(true); }
-    public String getEmail() { return txtEmail.getText(); }
-    public String getPassword() { return new String(txtPassword.getPassword()); }
-    public void showError(String m) { JOptionPane.showMessageDialog(this, m, "Erro", JOptionPane.ERROR_MESSAGE); }
+    // --- MÉTODOS OBRIGATÓRIOS DA VIEW (CONFORME DOCUMENTAÇÃO) ---
+    public void showView() { 
+        this.setVisible(true); 
+    }
+    
+    public String getEmail() { 
+        return txtEmail.getText(); 
+    }
+    
+    public String getPassword() { 
+        return new String(txtPassword.getPassword()); 
+    }
+    
+    public void showError(String m) { 
+        JOptionPane.showMessageDialog(this, m, "Erro", JOptionPane.ERROR_MESSAGE); 
+    }
+    
+    public void closeView() { 
+        this.dispose(); 
+    }
 
     /**
      * Configuração da Interface Gráfica com Logótipo.
@@ -53,9 +68,9 @@ public class LoginView extends javax.swing.JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        // 1. Logótipo Dinâmico (Substitui o texto "Finance Team")
+        // 1. Logótipo Dinâmico
         lblLogo = new JLabel("", SwingConstants.CENTER);
-        atualizarLogo(); // Método para carregar a imagem correta conforme o tema
+        atualizarLogo(); 
         
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -92,7 +107,7 @@ public class LoginView extends javax.swing.JFrame {
         estilizarCampo(txtPassword);
         loginCard.add(txtPassword, gbc);
 
-        // 4. Botão Login (Centralizado e Compacto)
+        // 4. Botão Login
         gbc.gridy = 3; gbc.gridx = 0; gbc.gridwidth = 2;
         gbc.insets = new Insets(30, 0, 10, 0);
         gbc.fill = GridBagConstraints.NONE;
@@ -119,7 +134,9 @@ public class LoginView extends javax.swing.JFrame {
         // 5. Botão Alternar Modo
         gbc.gridy = 4; gbc.insets = new Insets(20, 0, 0, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        btnThemeToggle = new JButton("Alternar Modo Escuro/Claro");
+        
+        String textoTema = ThemeManager.isDarkMode() ? "ALTERAR PARA PLANO CLARO" : "ALTERAR PARA PLANO ESCURO";
+        btnThemeToggle = new JButton(textoTema);
         estilizarBotaoSecundario(btnThemeToggle);
         btnThemeToggle.addActionListener(e -> {
             ThemeManager.toggleTheme();
@@ -144,12 +161,13 @@ public class LoginView extends javax.swing.JFrame {
         
         try {
             ImageIcon icon = new ImageIcon(getClass().getResource(path));
-            // Redimensiona o logótipo para um tamanho harmonioso (ex: 150px de largura)
             Image img = icon.getImage().getScaledInstance(200, -1, Image.SCALE_SMOOTH);
             lblLogo.setIcon(new ImageIcon(img));
         } catch (Exception e) {
             System.err.println("Erro ao carregar logótipo: " + e.getMessage());
-            lblLogo.setText("Finance Team"); // Fallback caso a imagem não carregue
+            lblLogo.setText("FINANCE TEAM"); 
+            lblLogo.setForeground(ThemeManager.getText());
+            lblLogo.setFont(new Font("SansSerif", Font.BOLD, 20));
         }
     }
 
@@ -174,9 +192,9 @@ public class LoginView extends javax.swing.JFrame {
 
     private void estilizarBotaoSecundario(JButton botao) {
         botao.setContentAreaFilled(false);
-        botao.setForeground(ThemeManager.getText());
-        botao.setFont(new Font("SansSerif", Font.ITALIC, 11));
-        botao.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getText()));
+        botao.setForeground(ThemeManager.getSubText());
+        botao.setFont(new Font("SansSerif", Font.BOLD, 10));
+        botao.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getSubText()));
         botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
