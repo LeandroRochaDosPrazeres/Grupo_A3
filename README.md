@@ -1,41 +1,74 @@
-# 🖥️ Documentação das Interfaces (Camada View)
+# 🖥️ Documentação das Interfaces (Camada View) - V1
 
-[cite_start]Este documento detalha as funcionalidades e implementações visuais realizadas nas telas do **Middleware de Otimização de Portfólio**, seguindo a arquitetura MVC proposta para o projeto[cite: 30, 77, 107].
-
-## 1. LoginView (Portal de Acesso)
-[cite_start]A porta de entrada do sistema, projetada para ser simples e funcional para usuários internos[cite: 22, 399].
-
-* [cite_start]**Autenticação**: Interface preparada para o login de Administradores e Gerentes de ativos[cite: 22, 79, 341].
-* **Componentes de Interface**:
-    * [cite_start]Campo de texto para inserção de **Email** (usuário)[cite: 402].
-    * [cite_start]Campo de senha protegido (**JPasswordField**)[cite: 402].
-    * [cite_start]Botão de ação (**btnLogin**) conectado ao respectivo Controller para validação[cite: 402, 408].
-* [cite_start]**Identidade Visual**: Design minimalista com foco em usabilidade e redução de distrações visuais[cite: 74, 81].
-
-## 2. DashboardView (Painel Administrativo)
-[cite_start]A central de controle do sistema, onde o usuário visualiza dados consolidados e indicadores gerais[cite: 9, 63, 409].
-
-* [cite_start]**Cards de Indicadores**: Exibição de métricas essenciais para a gestão do middleware[cite: 410, 411]:
-    * [cite_start]**Usuários**: Quantidade total de perfis cadastrados no sistema[cite: 411].
-    * [cite_start]**Investidores**: Total de clientes atendidos pelos gerentes[cite: 411].
-    * [cite_start]**Portfólios**: Quantidade de carteiras de ativos registradas[cite: 411].
-    * [cite_start]**Otimizações**: Histórico de execuções do motor de otimização de ativos[cite: 411].
-* **Gráfico Analítico de Barras**:
-    * [cite_start]Implementação de visualização gráfica para as métricas do sistema[cite: 25, 41, 47].
-    * Inclusão de **eixos (X/Y)** e **linhas de grade** para facilitar a leitura técnica dos dados.
-    * Legendas claras para identificação de cada categoria de indicador.
-* **Sidebar (Menu Lateral)**:
-    * [cite_start]Navegação centralizada entre as entidades do modelo: **Investidores**, **Ativos** e **Portfólios**[cite: 108, 413].
-    * [cite_start]Organização hierárquica que mantém a logo do projeto sempre visível[cite: 131].
-* **Gestão de UI/UX (Acessibilidade)**:
-    * **Alternador de Tema**: Opção minimalista no canto inferior esquerdo para alternar entre planos de fundo.
-    * **Modo Escuro (Dark Mode)**: Layout de alto contraste para ambientes de baixa luminosidade.
-    * **Modo Claro (Light Mode)**: Divisões visuais nítidas e contornos definidos para garantir a separação clara entre componentes.
-
-## 🛠️ Tecnologias e Padrões Aplicados
-* [cite_start]**Framework**: Java Swing (NetBeans)[cite: 4, 76, 107].
-* [cite_start]**Arquitetura**: Separação total da lógica de apresentação (View) das regras de negócio (Controller)[cite: 30, 31, 109, 111].
-* **Estilização**: Uso de um gerenciador de temas centralizado para garantir consistência visual em todo o middleware.
+Este documento detalha as funcionalidades, implementações visuais e a arquitetura de navegação das telas do **Middleware de Otimização de Portfólio**. Toda a interface foi desenvolvida em Java Swing seguindo rigorosamente o padrão arquitetural MVC (Model-View-Controller) e os princípios de UI/UX modernos.
 
 ---
-*Projeto acadêmico 
+
+## 🧭 Mapa das Telas Implementadas
+
+### 1. LoginView (Portal de Acesso)
+A porta de entrada do sistema, projetada para autenticação segura de usuários internos.
+* **Autenticação:** Interface preparada para o login de Administradores e Gerentes de ativos.
+* **Componentes:**
+  * Campo de texto para inserção de e-mail corporativo.
+  * Campo de senha protegido (`JPasswordField`).
+  * Botão de ação conectado ao `LoginController` para validação de credenciais.
+* **Identidade Visual:** Design minimalista focado na redução de distrações visuais.
+
+### 2. ManagerMainView (Contêiner Principal do Gerente)
+A "casca" estrutural da jornada operacional do gerente. Esta tela evoluiu a partir da antiga DashboardView para atuar como um contêiner dinâmico e responsivo.
+* **Área Central Dinâmica (`pnlContent`):** Utiliza ordenação por `BorderLayout` para ejetar e alternar sub-painéis (`JPanel`) em tempo real sem fechar a janela principal.
+* **Sidebar (Menu Lateral Corporativo):**
+  * Navegação centralizada entre os fluxos: **Novo Investidor**, **Histórico** e **Sair**.
+  * Exibição em tempo real do nome do usuário logado.
+  * Mantém a logo do projeto com redimensionamento suave (`SCALE_SMOOTH`).
+
+### 3. InvestorRegistrationOptimizationView (Formulário de Cadastro e Ativos)
+Painel embutido dedicado à captação de novos clientes e seleção de ativos para o modelo matemático de Markowitz.
+* **Localização Linguística (PT-BR):** Combo box configurada com os perfis de risco em português (`CONSERVADOR`, `MODERADO`, `AGRESSIVO`) para melhor experiência do usuário, convertendo os termos internamente para inglês antes do envio ao Supabase.
+* **Tabela de Ativos Selecionáveis:** Listagem de ativos estruturada via `DefaultTableModel` com suporte nativo a caixas de seleção (`Boolean.class` / Checkboxes) na primeira coluna.
+* **Controles Operacionais:** Botões de retorno, limpeza de formulário e o botão principal "Cadastrar e Otimizar".
+
+### 4. ManagerInvestorHistoryView (Histórico de Clientes)
+Painel focado na leitura e gerenciamento dos investidores já armazenados na base de dados.
+* **Tabela de Auditoria:** Apresenta de forma limpa o Nome, Documento (CPF/ID), Perfil de Risco e os Ativos atualmente selecionados por cada investidor.
+* **Ação Estratégica:** Botão inferior "Visualizar Carteira Otimizada" que identifica a linha selecionada na tabela através do método `getSelectedInvestorDocument()` e comanda a abertura dos resultados.
+
+### 5. InvestorDashboardView (Painel de Resultados Otimizados)
+A entrega final de valor do sistema, exibindo as métricas calculadas pelo motor de alocação de ativos.
+* **Cards de Performance Financeira:** Componentes customizados com cantos arredondados (`RoundRectangle2D`) e cores semânticas de alto contraste para indicar:
+  * **Retorno Esperado da Carteira** (Destaque em Verde).
+  * **Risco Estimado / Volatilidade** (Destaque em Vermelho).
+* **Tabela de Alocação de Pesos:** Demonstra o Ticker, Categoria, Percentual exato de alocação (%) e o valor financeiro sugerido (R$) para cada ativo que compõe o portfólio ideal.
+
+---
+
+## 🔄 Arquitetura de Controle e Navegação (MVC)
+
+O sistema opera com desacoplamento total por meio de circuitos de controladores injetados:
+
+<img width="677" height="192" alt="image" src="https://github.com/user-attachments/assets/73d7b905-ef92-4cdf-b3e9-269c88cce286" />
+
+* **`ManagerController`:** Controla a janela principal (`JFrame`) e gerencia qual painel central deve ser renderizado.
+* **`InvestorController`:** Centraliza as regras visuais das sub-views, possuindo construtores sobrecarregados para coordenar o fluxo entre o cadastro, a listagem do histórico e a exibição do dashboard final de resultados.
+
+---
+
+## 🎨 Gestão de UI/UX (Acessibilidade e Temas)
+
+O ecossistema visual é governado pela classe utilitária **`ThemeManager`**, permitindo alternância dinâmica em tempo real:
+* **Modo Escuro (Dark Mode):** Cores escuras profundas de paleta corporativa com textos em alto contraste para reduzir a fadiga ocular.
+* **Modo Claro (Light Mode):** Divisões visuais nítidas e contornos limpos para garantir visibilidade em ambientes muito iluminados.
+* **Componentes Customizados:** Sobrescrita do método `paintComponent` com ativação de *Anti-Aliasing* para renderização de cartões e botões com cantos arredondados e suaves.
+
+## 🛠️ Tecnologias Aplicadas
+
+* **Ambiente de Desenvolvimento:** NetBeans IDE
+* **Linguagem & Framework:** Java 25 / Java Swing (Desenvolvimento 100% via código/Handcoded para máxima performance e controle de layout).
+* **Versionamento:** Git & GitHub (Branching estruturado).
+
+---
+*Projeto Acadêmico 
+
+
+
