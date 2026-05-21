@@ -11,10 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Camada View (Swing) - InvestorRegistrationOptimizationView.
+ * Tela de cadastro de investidor com seleção de ativos e disparo da otimização.
+ * 
  * @author leandrorocha
  */
-
 public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
 
     private InvestorController controller;
@@ -22,7 +23,7 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
     // Componentes obrigatórios exigidos pela especificação técnica
     private JTextField txtInvestorName;
     private JTextField txtDocumentId;
-    private JComboBox<String> cmbRiskProfile; // Exibe em PT-BR, converte internamente
+    private JComboBox<String> cmbRiskProfile;
     private JTable tblAssets;
     private JButton btnCadastrarEOtimizar;
     private JButton btnLimpar;
@@ -40,7 +41,7 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
         this.controller = controller;
     }
 
-    // --- MÉTODOS CONTRATUAIS DA VIEW (AJUSTADO PARA TRADUÇÃO SUPABASE) ---
+    // --- MÉTODOS CONTRATUAIS DA VIEW ---
     
     public String getInvestorName() { 
         return txtInvestorName.getText(); 
@@ -50,25 +51,14 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
         return txtDocumentId.getText(); 
     }
 
-    /**
-     * Captura a seleção em português e mapeia para a String esperada pelo banco.
-     */
     public String getSelectedRiskProfile() { 
         String perfilSelecionado = (String) cmbRiskProfile.getSelectedItem();
-        
-        if ("CONSERVADOR".equals(perfilSelecionado)) {
-            return "CONSERVATIVE";
-        } else if ("MODERADO".equals(perfilSelecionado)) {
-            return "MODERATE";
-        } else if ("AGRESSIVO".equals(perfilSelecionado)) {
-            return "AGGRESSIVE";
-        }
+        if ("CONSERVADOR".equals(perfilSelecionado)) return "CONSERVATIVE";
+        if ("MODERADO".equals(perfilSelecionado)) return "MODERATE";
+        if ("AGRESSIVO".equals(perfilSelecionado)) return "AGGRESSIVE";
         return perfilSelecionado;
     }
 
-    /**
-     * Varre a tabela e retorna a lista de Tickers dos ativos selecionados.
-     */
     public List<String> getSelectedAssets() {
         List<String> ativosSelecionados = new ArrayList<>();
         for (int i = 0; i < tableModel.getRowCount(); i++) {
@@ -99,7 +89,7 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
     }
 
     /**
-     * Estruturação visual utilizando GridBagLayout para manter o padrão minimalista.
+     * Estruturação visual do painel de cadastro.
      */
     private void configurarPainel() {
         setLayout(new BorderLayout(0, 20));
@@ -134,44 +124,30 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
         
         gbc.gridwidth = 1; gbc.insets = new Insets(8, 8, 8, 8);
 
-        // Rótulo e Campo: Nome
-        JLabel lblNome = new JLabel("Nome Completo:");
-        lblNome.setForeground(ThemeManager.getText());
-        lblNome.setFont(new Font("SansSerif", Font.BOLD, 13));
+        // Campo: Nome
         gbc.gridx = 0; gbc.gridy = 1;
-        pnlInvestorData.add(lblNome, gbc);
-
+        pnlInvestorData.add(criarLabel("Nome Completo:"), gbc);
+        gbc.gridx = 1;
         txtInvestorName = new JTextField(20);
         estilizarCampo(txtInvestorName);
-        gbc.gridx = 1;
         pnlInvestorData.add(txtInvestorName, gbc);
 
-        // Rótulo e Campo: Documento
-        JLabel lblDoc = new JLabel("Documento (ID):");
-        lblDoc.setForeground(ThemeManager.getText());
-        lblDoc.setFont(new Font("SansSerif", Font.BOLD, 13));
+        // Campo: Documento
         gbc.gridx = 2;
-        pnlInvestorData.add(lblDoc, gbc);
-
+        pnlInvestorData.add(criarLabel("Documento (CPF):"), gbc);
+        gbc.gridx = 3;
         txtDocumentId = new JTextField(15);
         estilizarCampo(txtDocumentId);
-        gbc.gridx = 3;
         pnlInvestorData.add(txtDocumentId, gbc);
 
-        // Rótulo e Campo: Perfil de Risco
-        JLabel lblPerfil = new JLabel("Perfil de Risco:");
-        lblPerfil.setForeground(ThemeManager.getText());
-        lblPerfil.setFont(new Font("SansSerif", Font.BOLD, 13));
+        // Campo: Perfil de Risco
         gbc.gridx = 0; gbc.gridy = 2;
-        pnlInvestorData.add(lblPerfil, gbc);
-
-        // --- ALTERAÇÃO SOLICITADA: Opções alteradas de inglês para português do Brasil ---
+        pnlInvestorData.add(criarLabel("Perfil de Risco:"), gbc);
+        gbc.gridx = 1;
         String[] perfis = {"CONSERVADOR", "MODERADO", "AGRESSIVO"};
         cmbRiskProfile = new JComboBox<>(perfis);
         cmbRiskProfile.setPreferredSize(new Dimension(200, 35));
-        cmbRiskProfile.setBackground(ThemeManager.getBg());
-        cmbRiskProfile.setForeground(ThemeManager.getText());
-        gbc.gridx = 1;
+        ThemeManager.estilizarComboBox(cmbRiskProfile);
         pnlInvestorData.add(cmbRiskProfile, gbc);
 
         add(pnlInvestorData, BorderLayout.NORTH);
@@ -186,7 +162,7 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
         pnlAssetSelection.add(lblSub, BorderLayout.NORTH);
 
         tableModel = new DefaultTableModel(
-            new Object[]{"Selecionar", "Ticker", "Nome do Ativo", "Categoria", "Risco Base"}, 0
+            new Object[]{"✓", "Ticker", "Nome do Ativo", "Categoria", "Risco Base"}, 0
         ) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
@@ -199,14 +175,12 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
         };
 
         tblAssets = new JTable(tableModel);
-        tblAssets.setRowHeight(30);
-        tblAssets.setBackground(ThemeManager.getCard());
-        tblAssets.setForeground(ThemeManager.getText());
-        tblAssets.setGridColor(ThemeManager.getBg());
+        ThemeManager.estilizarTabela(tblAssets);
+        tblAssets.getColumnModel().getColumn(0).setMaxWidth(50);
+        tblAssets.getColumnModel().getColumn(0).setMinWidth(50);
         
         JScrollPane scrollPane = new JScrollPane(tblAssets);
-        scrollPane.setBorder(BorderFactory.createLineBorder(ThemeManager.getCard()));
-        scrollPane.getViewport().setBackground(ThemeManager.getBg());
+        ThemeManager.estilizarScrollPane(scrollPane);
         pnlAssetSelection.add(scrollPane, BorderLayout.CENTER);
 
         add(pnlAssetSelection, BorderLayout.CENTER);
@@ -253,14 +227,17 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
         tableModel.addRow(new Object[]{false, "VALE3", "Vale S.A.", "Ação", "Alto"});
         tableModel.addRow(new Object[]{false, "BBDC4", "Banco Bradesco S.A.", "Ação", "Médio"});
         tableModel.addRow(new Object[]{false, "BOVA11", "iShares Ibovespa Index ETF", "ETF", "Médio"});
-        tableModel.addRow(new Object[]{false, "TESOURO2029", "Tesouro IPCA+", "Renda Fixa", "Baixo"});
-        tableModel.addRow(new Object[]{false, "CDB_PRE", "CDB Prefixado Itaú", "Renda Fixa", "Baixo"});
+        tableModel.addRow(new Object[]{false, "TESOURO2029", "Tesouro IPCA+ 2029", "Renda Fixa", "Baixo"});
+        tableModel.addRow(new Object[]{false, "CDB_PRE", "CDB Prefixado Itaú 12%", "Renda Fixa", "Baixo"});
         tableModel.addRow(new Object[]{false, "KNRI11", "Kinea Renda Imobiliária FII", "FII", "Baixo"});
-        tableModel.addRow(new Object[]{false, "IVVB11", "S&P 500 Index ETF", "ETF", "Alto"});
+        tableModel.addRow(new Object[]{false, "IVVB11", "iShares S&P 500 ETF", "ETF", "Alto"});
     }
 
-    private void abrirBordaCampo(JTextField campo) {
-        campo.setBorder(BorderFactory.createLineBorder(ThemeManager.isDarkMode() ? new Color(56, 139, 253) : new Color(216, 222, 228), 1));
+    private JLabel criarLabel(String texto) {
+        JLabel lbl = new JLabel(texto);
+        lbl.setForeground(ThemeManager.getText());
+        lbl.setFont(new Font("SansSerif", Font.BOLD, 13));
+        return lbl;
     }
 
     private void estilizarCampo(JTextField campo) {
@@ -268,7 +245,10 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
         campo.setBackground(ThemeManager.getBg());
         campo.setForeground(ThemeManager.getText());
         campo.setCaretColor(ThemeManager.getAccent());
-        abrirBordaCampo(campo);
+        campo.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(ThemeManager.getBorder(), 1),
+            new EmptyBorder(4, 8, 4, 8)
+        ));
     }
 
     private void estilizarBotaoPrincipal(JButton botao) {
@@ -287,7 +267,7 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
         botao.setContentAreaFilled(false);
         botao.setForeground(ThemeManager.getText());
         botao.setFont(new Font("SansSerif", Font.BOLD, 11));
-        botao.setBorder(BorderFactory.createLineBorder(ThemeManager.getSubText(), 1));
+        botao.setBorder(BorderFactory.createLineBorder(ThemeManager.getBorder(), 1));
         botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 }

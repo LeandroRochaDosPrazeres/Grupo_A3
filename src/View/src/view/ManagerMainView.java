@@ -71,8 +71,7 @@ public class ManagerMainView extends javax.swing.JFrame {
         sidebar.setPreferredSize(new Dimension(260, 0));
         sidebar.setBackground(ThemeManager.getCard());
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, 
-                ThemeManager.isDarkMode() ? new Color(48, 54, 61) : new Color(216, 222, 228)));
+        sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, ThemeManager.getBorder()));
 
         // 1. Logo Centralizada
         sidebar.add(Box.createRigidArea(new Dimension(0, 40)));
@@ -120,27 +119,32 @@ public class ManagerMainView extends javax.swing.JFrame {
         // Empurra o alternador monocromático para o rodapé
         sidebar.add(Box.createVerticalGlue());
         
-        // 3. Alternador de Tema Ultra-Minimalista
-        String iconSymbol = ThemeManager.isDarkMode() ? "☾" : "☼"; 
-        JButton btnTheme = new JButton(iconSymbol);
-        btnTheme.setFont(new Font("SansSerif", Font.PLAIN, 22));
+        // Toggle de Tema profissional
+        String textoTema = ThemeManager.isDarkMode() ? "Modo Claro" : "Modo Escuro";
+        JButton btnTheme = new JButton(textoTema);
+        btnTheme.setFont(new Font("SansSerif", Font.PLAIN, 11));
         btnTheme.setForeground(ThemeManager.getSubText());
         btnTheme.setContentAreaFilled(false);
-        btnTheme.setBorderPainted(false);
+        btnTheme.setBorderPainted(true);
+        btnTheme.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(
+                ThemeManager.isDarkMode() ? new Color(48, 54, 61) : new Color(216, 222, 228), 1),
+            new EmptyBorder(6, 12, 6, 12)
+        ));
         btnTheme.setFocusPainted(false);
         btnTheme.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        JPanel themePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
-        themePanel.setOpaque(false);
-        themePanel.setMaximumSize(new Dimension(260, 50));
-        themePanel.add(btnTheme);
+        btnTheme.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnTheme.setMaximumSize(new Dimension(160, 32));
         
         btnTheme.addActionListener(e -> {
             ThemeManager.toggleTheme();
             configurarInterface();
             SwingUtilities.updateComponentTreeUI(this);
         });
-        sidebar.add(themePanel);
+
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(btnTheme);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 15)));
 
         // --- ÁREA CENTRAL DE CONTEÚDO ---
         JPanel areaPainelDireita = new JPanel(new BorderLayout());
@@ -158,13 +162,25 @@ public class ManagerMainView extends javax.swing.JFrame {
         pnlContent.setOpaque(false);
         pnlContent.setBorder(new EmptyBorder(30, 0, 0, 0));
         
-        // Painel temporário de boas-vindas
+        // Painel temporário de boas-vindas com cards informativos
         JPanel pnlBoasVindas = new JPanel(new GridBagLayout());
         pnlBoasVindas.setOpaque(false);
-        JLabel lblMsg = new JLabel("Selecione uma operação no menu lateral para iniciar.");
-        lblMsg.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        lblMsg.setForeground(ThemeManager.getSubText());
-        pnlBoasVindas.add(lblMsg);
+        
+        JPanel cardBoasVindas = new JPanel(new BorderLayout(0, 20));
+        cardBoasVindas.setOpaque(false);
+        
+        JLabel lblWelcome = new JLabel("Bem-vindo ao Painel Operacional");
+        lblWelcome.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblWelcome.setForeground(ThemeManager.getText());
+        cardBoasVindas.add(lblWelcome, BorderLayout.NORTH);
+        
+        JLabel lblInstrucao = new JLabel("<html><p style='width:400px;'>Selecione uma operação no menu lateral para iniciar. "
+            + "Você pode cadastrar novos investidores, otimizar portfólios ou consultar o histórico de clientes.</p></html>");
+        lblInstrucao.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        lblInstrucao.setForeground(ThemeManager.getSubText());
+        cardBoasVindas.add(lblInstrucao, BorderLayout.CENTER);
+        
+        pnlBoasVindas.add(cardBoasVindas);
         pnlContent.add(pnlBoasVindas, BorderLayout.CENTER);
 
         areaPainelDireita.add(pnlContent, BorderLayout.CENTER);

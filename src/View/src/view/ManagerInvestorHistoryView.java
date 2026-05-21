@@ -1,18 +1,19 @@
 package view;
 
 import util.ThemeManager;
-import controller.InvestorController; // Controlador que gerencia as ações dos investidores
+import controller.InvestorController;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+
 /**
- *
+ * Camada View (Swing) - ManagerInvestorHistoryView.
+ * Tela de histórico dos investidores cadastrados pelo gerente logado.
+ * 
  * @author leandrorocha
  */
-
-
 public class ManagerInvestorHistoryView extends javax.swing.JPanel {
 
     private InvestorController controller;
@@ -26,7 +27,7 @@ public class ManagerInvestorHistoryView extends javax.swing.JPanel {
 
     public ManagerInvestorHistoryView() {
         configurarPainel();
-        carregarHistoricoMockado(); // Dados simulados para a V1
+        carregarHistoricoMockado();
     }
 
     public void setController(InvestorController controller) {
@@ -34,18 +35,22 @@ public class ManagerInvestorHistoryView extends javax.swing.JPanel {
     }
 
     /**
-     * Retorna o ID/Documento do investidor que o gerente selecionou na tabela.
+     * Retorna o Documento do investidor selecionado na tabela.
      */
     public String getSelectedInvestorDocument() {
         int linhaSelecionada = tblInvestors.getSelectedRow();
         if (linhaSelecionada != -1) {
-            return (String) tableModel.getValueAt(linhaSelecionada, 1); // Coluna 1 é o Documento
+            return (String) tableModel.getValueAt(linhaSelecionada, 1);
         }
         return null;
     }
 
     public void showError(String message) {
         JOptionPane.showMessageDialog(this, message, "Aviso", JOptionPane.WARNING_MESSAGE);
+    }
+
+    public void showSuccess(String message) {
+        JOptionPane.showMessageDialog(this, message, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -65,12 +70,13 @@ public class ManagerInvestorHistoryView extends javax.swing.JPanel {
         lblTitulo.setForeground(ThemeManager.getAccent());
         pnlHeader.add(lblTitulo, BorderLayout.WEST);
 
-        btnAtualizar = new JButton("🔄 Atualizar Tabela");
+        btnAtualizar = new JButton("Atualizar");
         btnAtualizar.setFont(new Font("SansSerif", Font.PLAIN, 12));
         btnAtualizar.setForeground(ThemeManager.getText());
         btnAtualizar.setContentAreaFilled(false);
-        btnAtualizar.setBorder(BorderFactory.createLineBorder(ThemeManager.getSubText(), 1));
+        btnAtualizar.setBorder(BorderFactory.createLineBorder(ThemeManager.getBorder(), 1));
         btnAtualizar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnAtualizar.setPreferredSize(new Dimension(120, 32));
         btnAtualizar.addActionListener(e -> {
             if (controller != null) controller.loadInvestorHistory(null);
         });
@@ -78,28 +84,21 @@ public class ManagerInvestorHistoryView extends javax.swing.JPanel {
 
         add(pnlHeader, BorderLayout.NORTH);
 
-        // 2. Tabela de Clientes
+        // 2. Tabela de Investidores
         tableModel = new DefaultTableModel(
-            new Object[]{"Nome do Investidor", "Documento (ID)", "Perfil de Risco", "Ativos Selecionados"}, 0
+            new Object[]{"Nome do Investidor", "Documento (CPF)", "Perfil de Risco", "Ativos Selecionados", "Data de Cadastro"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Histórico é apenas para leitura
+                return false;
             }
         };
 
         tblInvestors = new JTable(tableModel);
-        tblInvestors.setRowHeight(35);
-        tblInvestors.setBackground(ThemeManager.getCard());
-        tblInvestors.setForeground(ThemeManager.getText());
-        tblInvestors.setGridColor(ThemeManager.getBg());
-        tblInvestors.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        tblInvestors.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        ThemeManager.estilizarTabela(tblInvestors);
 
         JScrollPane scrollPane = new JScrollPane(tblInvestors);
-        scrollPane.setBorder(BorderFactory.createLineBorder(ThemeManager.getCard()));
-        scrollPane.getViewport().setBackground(ThemeManager.getBg());
-        
+        ThemeManager.estilizarScrollPane(scrollPane);
         add(scrollPane, BorderLayout.CENTER);
 
         // 3. Barra de Ações Inferior
@@ -140,9 +139,10 @@ public class ManagerInvestorHistoryView extends javax.swing.JPanel {
     }
 
     private void carregarHistoricoMockado() {
-        // Dados fictícios simulando registros vindos do Supabase para teste de layout
-        tableModel.addRow(new Object[]{"Ana Silva Mendes", "123.456.789-00", "CONSERVADOR", "TESOURO2029, CDB_PRE"});
-        tableModel.addRow(new Object[]{"Carlos Roberto Souza", "987.654.321-11", "AGRESSIVO", "PETR4, VALE3, IVVB11"});
-        tableModel.addRow(new Object[]{"Mariana Oliveira Dias", "455.788.122-33", "MODERADO", "BOVA11, KNRI11, BBDC4"});
+        tableModel.addRow(new Object[]{"Ana Silva Mendes", "123.456.789-00", "CONSERVADOR", "TESOURO2029, CDB_PRE, KNRI11", "15/03/2025"});
+        tableModel.addRow(new Object[]{"Carlos Roberto Souza", "987.654.321-11", "AGRESSIVO", "PETR4, VALE3, IVVB11", "22/03/2025"});
+        tableModel.addRow(new Object[]{"Mariana Oliveira Dias", "455.788.122-33", "MODERADO", "BOVA11, KNRI11, BBDC4", "10/04/2025"});
+        tableModel.addRow(new Object[]{"Fernando Costa Lima", "321.654.987-44", "CONSERVADOR", "TESOURO2029, CDB_PRE", "28/04/2025"});
+        tableModel.addRow(new Object[]{"Juliana Pereira Santos", "789.123.456-55", "MODERADO", "BOVA11, VALE3, KNRI11, CDB_PRE", "05/05/2025"});
     }
 }
