@@ -1,88 +1,75 @@
 package model;
 
-
-import java.util.List;
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 
-public class Portfolio {
-    Long id, investorId;
-    String name;
-    BigDecimal desiredRiskLevel;
-    OffsetDateTime createdAt;
-    Investor investor;
-    List<PortfolioItem> items = new ArrayList<>();
+public class User {
 
-    public Long getId() {
-        return id;
-    }
+    private Long id;
+    private String name;
+    private String email;
+    private String passwordHash;
+    private UserRole role;
+    private String managerCode;
+    private boolean active;
+    private OffsetDateTime createdAt;
 
-    public void setId(Long id) {
+    public User() {}
+
+    public User(Long id, String name, String email, String passwordHash,
+                UserRole role, String managerCode, boolean active, OffsetDateTime createdAt) {
         this.id = id;
-    }
-
-    public Long getInvestorId() {
-        return investorId;
-    }
-
-    public void setInvestorId(Long investorId) {
-        this.investorId = investorId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public BigDecimal getDesiredRiskLevel() {
-        return desiredRiskLevel;
-    }
-
-    public void setDesiredRiskLevel(BigDecimal desiredRiskLevel) {
-        this.desiredRiskLevel = desiredRiskLevel;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.managerCode = managerCode;
+        this.active = active;
         this.createdAt = createdAt;
     }
 
-    public Investor getInvestor() {
-        return investor;
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
+    public UserRole getRole() { return role; }
+    public void setRole(UserRole role) { this.role = role; }
+
+    public String getManagerCode() { return managerCode; }
+    public void setManagerCode(String managerCode) { this.managerCode = managerCode; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+
+    public OffsetDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
+
+    public boolean isAdmin() {
+        return role == UserRole.ADMIN;
     }
 
-    public void setInvestor(Investor investor) {
-        this.investor = investor;
+    public boolean isManager() {
+        return role == UserRole.MANAGER;
     }
 
-    public List<PortfolioItem> getItems() {
-        return items;
+    public boolean isInvestor() {
+        return role == UserRole.INVESTOR;
     }
 
-    public void setItems(List<PortfolioItem> items) {
-        this.items = items;
-    }
-  
-    public BigDecimal getTotalValue() {
-        BigDecimal total = BigDecimal.ZERO;
-        for (PortfolioItem item : items) {
-            total = total.add(item.getPositionValue());
-        }
-        return total;
+    public boolean checkPassword(String plainPassword) {
+        if (plainPassword == null || passwordHash == null) return false;
+        return passwordHash.equals(plainPassword);
     }
 
-    public void addItem(PortfolioItem item) {
-        items.add(item);
-    }
-
-    public void removeItem(PortfolioItem item) {
-        items.remove(item);
+    @Override
+    public String toString() {
+        return name + " (" + email + ")";
     }
 }
