@@ -5,27 +5,25 @@ import java.time.OffsetDateTime;
 
 public class Optimization {
 
-    private Long id;                    
-    private Long portfolioId;           
-    private Long runByUserId;           
-    private BigDecimal expectedReturn;  
-    private BigDecimal totalRisk;       
-    private OffsetDateTime createdAt;   
-
-    
+    private Long id;
+    private Long portfolioId;
+    private Long runByUserId;
+    private BigDecimal expectedReturn;
+    private BigDecimal totalRisk;
+    private OffsetDateTime createdAt;
 
     public Optimization() {
     }
 
-    public Optimization(Long portfolioId, Long runByUserId,
-                        BigDecimal expectedReturn, BigDecimal totalRisk) {
+    public Optimization(Long id, Long portfolioId, Long runByUserId,
+                        BigDecimal expectedReturn, BigDecimal totalRisk, OffsetDateTime createdAt) {
+        this.id = id;
         this.portfolioId = portfolioId;
         this.runByUserId = runByUserId;
         this.expectedReturn = expectedReturn;
         this.totalRisk = totalRisk;
+        this.createdAt = createdAt;
     }
-
-    
 
     public Long getId() {
         return id;
@@ -74,8 +72,6 @@ public class Optimization {
     public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-   
 
     @Override
     public String toString() {

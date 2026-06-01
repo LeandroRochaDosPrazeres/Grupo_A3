@@ -1,13 +1,31 @@
+// PortfolioItem.java
 package model;
-
 
 import java.math.BigDecimal;
 
 public class PortfolioItem {
-    Long id, portfolioId, assetId;
-    BigDecimal quantity, averagePrice, suggestedPercentage;
-    Portfolio portfolio;
-    Asset asset;
+
+    private Long id;
+    private Long portfolioId;
+    private Long assetId;
+    private BigDecimal quantity;
+    private BigDecimal averagePrice;
+    private BigDecimal suggestedPercentage;
+    private Portfolio portfolio;
+    private Asset asset;
+
+    public PortfolioItem() {
+    }
+
+    public PortfolioItem(Long id, Long portfolioId, Long assetId,
+                         BigDecimal quantity, BigDecimal averagePrice, BigDecimal suggestedPercentage) {
+        this.id = id;
+        this.portfolioId = portfolioId;
+        this.assetId = assetId;
+        this.quantity = quantity;
+        this.averagePrice = averagePrice;
+        this.suggestedPercentage = suggestedPercentage;
+    }
 
     public Long getId() {
         return id;
@@ -72,8 +90,11 @@ public class PortfolioItem {
     public void setAsset(Asset asset) {
         this.asset = asset;
     }
-    
-    public BigDecimal getPositionValue(){
+
+    public BigDecimal getPositionValue() {
+        if (quantity == null || averagePrice == null) {
+            return BigDecimal.ZERO;
+        }
         return quantity.multiply(averagePrice);
     }
 }

@@ -1,18 +1,31 @@
 package model;
 
-
-import java.util.List;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Portfolio {
-    Long id, investorId;
-    String name;
-    BigDecimal desiredRiskLevel;
-    OffsetDateTime createdAt;
-    Investor investor;
-    List<PortfolioItem> items = new ArrayList<>();
+
+    private Long id;
+    private Long investorId;
+    private String name;
+    private BigDecimal desiredRiskLevel;
+    private OffsetDateTime createdAt;
+    private Investor investor;
+    private List<PortfolioItem> items = new ArrayList<>();
+
+    public Portfolio() {
+    }
+
+    public Portfolio(Long id, Long investorId, String name,
+                     BigDecimal desiredRiskLevel, OffsetDateTime createdAt) {
+        this.id = id;
+        this.investorId = investorId;
+        this.name = name;
+        this.desiredRiskLevel = desiredRiskLevel;
+        this.createdAt = createdAt;
+    }
 
     public Long getId() {
         return id;
@@ -69,20 +82,22 @@ public class Portfolio {
     public void setItems(List<PortfolioItem> items) {
         this.items = items;
     }
-  
+
     public BigDecimal getTotalValue() {
         BigDecimal total = BigDecimal.ZERO;
         for (PortfolioItem item : items) {
-            total = total.add(item.getPositionValue());
+            if (item != null && item.getPositionValue() != null) {
+                total = total.add(item.getPositionValue());
+            }
         }
         return total;
     }
 
     public void addItem(PortfolioItem item) {
-        items.add(item);
+        this.items.add(item);
     }
 
     public void removeItem(PortfolioItem item) {
-        items.remove(item);
+        this.items.remove(item);
     }
 }

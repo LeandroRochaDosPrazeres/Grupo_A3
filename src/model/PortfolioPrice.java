@@ -3,14 +3,11 @@ package model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-
 public class PortfolioPrice {
 
-    private LocalDate date;       
-    private String ticker;        
-    private BigDecimal price;     
-
-    
+    private LocalDate date;
+    private String ticker;
+    private BigDecimal price;
 
     public PortfolioPrice() {
     }
@@ -20,8 +17,6 @@ public class PortfolioPrice {
         this.ticker = ticker;
         this.price = price;
     }
-
-    
 
     public LocalDate getDate() {
         return date;
@@ -46,8 +41,6 @@ public class PortfolioPrice {
     public void setPrice(BigDecimal price) {
         this.price = price;
     }
-
-    
 
     @Override
     public String toString() {

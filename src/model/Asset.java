@@ -1,12 +1,33 @@
 package model;
 
-
 import java.math.BigDecimal;
 
 public class Asset {
-    String ticker, name, category;
-    Long id;
-    BigDecimal baseRisk;
+
+    private Long id;
+    private String ticker;
+    private String name;
+    private String category;
+    private BigDecimal baseRisk;
+
+    public Asset() {
+    }
+
+    public Asset(Long id, String ticker, String name, String category, BigDecimal baseRisk) {
+        this.id = id;
+        this.ticker = ticker;
+        this.name = name;
+        this.category = category;
+        this.baseRisk = baseRisk;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getTicker() {
         return ticker;
@@ -32,14 +53,6 @@ public class Asset {
         this.category = category;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public BigDecimal getBaseRisk() {
         return baseRisk;
     }
@@ -49,8 +62,6 @@ public class Asset {
     }
 
     public String getDisplayName() {
-        return ticker+" - "+name;
+        return ticker + " - " + name;
     }
-    
-    
 }

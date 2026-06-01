@@ -2,18 +2,23 @@ package model;
 
 import java.time.OffsetDateTime;
 
-
 public class LogEntry {
 
-    private Long id;                    
-    private Long userId;                
-    private String action;              
-    private String details;             
-    private OffsetDateTime createdAt;   
-
-    
+    private Long id;
+    private Long userId;
+    private String action;
+    private String details;
+    private OffsetDateTime createdAt;
 
     public LogEntry() {
+    }
+
+    public LogEntry(Long id, Long userId, String action, String details, OffsetDateTime createdAt) {
+        this.id = id;
+        this.userId = userId;
+        this.action = action;
+        this.details = details;
+        this.createdAt = createdAt;
     }
 
     public LogEntry(Long userId, String action, String details) {
@@ -21,8 +26,6 @@ public class LogEntry {
         this.action = action;
         this.details = details;
     }
-
-    
 
     public Long getId() {
         return id;
@@ -63,8 +66,6 @@ public class LogEntry {
     public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-    
 
     @Override
     public String toString() {
