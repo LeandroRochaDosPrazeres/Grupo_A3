@@ -1,6 +1,7 @@
 # Definição de Camadas e Classes – V1
 
-> **Data:** 2026-05-06
+> **Data:** 2026-05-06  
+> **Status:** ✅ Implementado e integrado — todas as classes descritas neste documento estão criadas e funcionais em `src/view/src/`
 
 ---
 

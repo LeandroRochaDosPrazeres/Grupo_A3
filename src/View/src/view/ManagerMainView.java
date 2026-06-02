@@ -52,7 +52,7 @@ public class ManagerMainView extends javax.swing.JFrame {
     }
 
     public void showError(String message) { 
-        JOptionPane.showMessageDialog(this, message, "Erro", JOptionPane.ERROR_MESSAGE); 
+        util.MessageUtil.showError(this, message); 
     }
 
     /**
@@ -219,11 +219,6 @@ public class ManagerMainView extends javax.swing.JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            ManagerMainView janela = new ManagerMainView();
-            ManagerController controller = new ManagerController(janela);
-            janela.setController(controller); // Vincula o cérebro à tela
-            janela.setVisible(true);
-        });
+        app.Main.main(args);
     }
 }

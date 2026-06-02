@@ -45,6 +45,10 @@ public class PortfolioItemDAO extends SupabaseClient {
         patch(TABLE + "?id=eq." + id, json);
     }
 
+    public void delete(Long id) {
+        deleteById(TABLE, id);
+    }
+
     private List<PortfolioItem> toList(JsonArray arr) {
         List<PortfolioItem> list = new ArrayList<>();
         for (JsonElement element : arr) {

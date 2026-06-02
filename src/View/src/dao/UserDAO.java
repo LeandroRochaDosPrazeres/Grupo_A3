@@ -37,6 +37,15 @@ public class UserDAO extends SupabaseClient {
         return Optional.of(fromJson(array.get(0).getAsJsonObject()));
     }
 
+    public java.util.List<User> findAll() {
+        JsonArray array = get(TABLE + "?select=*&order=id.asc");
+        java.util.List<User> users = new java.util.ArrayList<>();
+        for (int i = 0; i < array.size(); i++) {
+            users.add(fromJson(array.get(i).getAsJsonObject()));
+        }
+        return users;
+    }
+
     public Optional<User> findById(Long id) {
         JsonArray array = get(TABLE + "?id=eq." + id + "&select=*");
         if (array.isEmpty()) return Optional.empty();

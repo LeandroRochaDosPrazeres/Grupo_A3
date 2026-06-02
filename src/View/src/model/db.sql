@@ -71,7 +71,7 @@ CREATE TABLE public.users (
   name character varying NOT NULL,
   email character varying NOT NULL UNIQUE,
   password_hash character varying NOT NULL,
-  role character varying NOT NULL CHECK (role::text = ANY (ARRAY['ADMIN'::character varying, 'MANAGER'::character varying]::text[])),
+  role character varying NOT NULL CHECK (role::text = ANY (ARRAY['ADMIN'::character varying, 'MANAGER'::character varying, 'INVESTOR'::character varying]::text[])),
   manager_code character varying,
   active boolean NOT NULL DEFAULT true,
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,

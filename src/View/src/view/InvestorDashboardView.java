@@ -2,11 +2,17 @@ package view;
 
 import util.ThemeManager;
 import controller.InvestorController;
+import model.Investor;
+import model.Optimization;
+import model.PortfolioItem;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 
 /**
  * Camada View (Swing) - InvestorDashboardView.
@@ -27,10 +33,15 @@ public class InvestorDashboardView extends javax.swing.JPanel {
     private JButton btnVoltar;
     private JButton btnNovoInvestidor;
     private DefaultTableModel tableModel;
+    private double[] donutPercentuais = {40, 30, 20, 10};
+    private String[] donutLabels = {"PETR4", "VALE3", "IVVB11", "BOVA11"};
+    private JPanel pnlDonut;
 
     public InvestorDashboardView() {
         configurarPainel();
-        carregarDadosSimulados();
+        // dados simulados apenas para preview visual isolado (sem controller)
+        // quando setInvestorData + loadPortfolioItems + setOptimizationSummary são chamados,
+        // os dados reais substituem tudo
     }
 
     public void setController(InvestorController controller) {
@@ -47,9 +58,83 @@ public class InvestorDashboardView extends javax.swing.JPanel {
         lblPerfilRisco.setText("Perfil: " + profile);
     }
 
-    public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Erro", JOptionPane.ERROR_MESSAGE);
+    // preenche nome e perfil de risco la em cima usando o objeto Investor
+    public void setInvestorData(Investor investor) {
+        if (investor == null) return;
+        lblNomeInvestidor.setText("Investidor: " + investor.getName());
+        if (investor.getRiskProfile() != null) {
+            lblPerfilRisco.setText("Perfil: " + investor.getRiskProfile().name());
+        }
     }
+
+    // monta a tabela e o grafico donut com os itens otimizados da carteira
+    public void loadPortfolioItems(List<PortfolioItem> items) {
+        tableModel.setRowCount(0);
+        if (items == null || items.isEmpty()) {
+            donutPercentuais = new double[]{100};
+            donutLabels = new String[]{"—"};
+            if (pnlDonut != null) pnlDonut.repaint();
+            return;
+        }
+
+        BigDecimal valorTotal = BigDecimal.ZERO;
+        for (PortfolioItem item : items) {
+            if (item.getPositionValue() != null) {
+                valorTotal = valorTotal.add(item.getPositionValue());
+            }
+        }
+
+        donutPercentuais = new double[items.size()];
+        donutLabels = new String[items.size()];
+
+        for (int i = 0; i < items.size(); i++) {
+            PortfolioItem item = items.get(i);
+            String ticker = item.getAsset() != null ? item.getAsset().getTicker() : ("Ativo " + item.getAssetId());
+            String nome = item.getAsset() != null ? item.getAsset().getName() : "—";
+            String categoria = item.getAsset() != null ? item.getAsset().getCategory() : "—";
+
+            BigDecimal perc = item.getSuggestedPercentage() != null
+                    ? item.getSuggestedPercentage().multiply(BigDecimal.valueOf(100))
+                    : BigDecimal.ZERO;
+
+            BigDecimal valorPosicao = item.getPositionValue() != null ? item.getPositionValue() : BigDecimal.ZERO;
+
+            tableModel.addRow(new Object[]{
+                    ticker, nome, categoria,
+                    perc.setScale(1, RoundingMode.HALF_UP) + "%",
+                    "R$ " + valorPosicao.setScale(2, RoundingMode.HALF_UP)
+            });
+
+            donutLabels[i] = ticker;
+            donutPercentuais[i] = perc.doubleValue();
+        }
+
+        if (pnlDonut != null) pnlDonut.repaint();
+    }
+
+    // atualiza os cards de retorno esperado e risco total
+    public void setOptimizationSummary(Optimization optimization) {
+        if (optimization == null) {
+            if (lblRetornoEsperado != null) lblRetornoEsperado.setText("—");
+            if (lblVolatilidade != null) lblVolatilidade.setText("—");
+            return;
+        }
+        if (lblRetornoEsperado != null && optimization.getExpectedReturn() != null) {
+            BigDecimal ret = optimization.getExpectedReturn().multiply(BigDecimal.valueOf(100));
+            lblRetornoEsperado.setText(ret.setScale(2, RoundingMode.HALF_UP) + "% a.a.");
+        }
+        if (lblVolatilidade != null && optimization.getTotalRisk() != null) {
+            BigDecimal risco = optimization.getTotalRisk().multiply(BigDecimal.valueOf(100));
+            lblVolatilidade.setText(risco.setScale(2, RoundingMode.HALF_UP) + "% a.a.");
+        }
+    }
+
+    public void showError(String message) {
+        util.MessageUtil.showError(this, message);
+    }
+
+    // helper de teste: quantas linhas a tabela de alocacao esta mostrando
+    public int getRowCountForTest() { return tableModel.getRowCount(); }
 
     /**
      * Estrutura visual baseada em Cards e Tabelas.
@@ -84,8 +169,8 @@ public class InvestorDashboardView extends javax.swing.JPanel {
         pnlCards.setOpaque(false);
         pnlCards.setPreferredSize(new Dimension(0, 110));
 
-        pnlCards.add(criarCardInfo("Retorno Esperado", "12.85% a.a.", new Color(46, 160, 67)));
-        pnlCards.add(criarCardInfo("Risco (Volatilidade)", "7.12% a.a.", new Color(248, 81, 73)));
+        pnlCards.add(criarCardInfo("Retorno Esperado", "—", new Color(46, 160, 67)));
+        pnlCards.add(criarCardInfo("Risco (Volatilidade)", "—", new Color(248, 81, 73)));
         pnlCentral.add(pnlCards, BorderLayout.NORTH);
 
         // Painel do meio: Gráfico Donut + Tabela
@@ -93,7 +178,7 @@ public class InvestorDashboardView extends javax.swing.JPanel {
         pnlMeio.setOpaque(false);
 
         // Gráfico Donut de alocação
-        JPanel pnlDonut = new JPanel() {
+        pnlDonut = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -106,14 +191,14 @@ public class InvestorDashboardView extends javax.swing.JPanel {
                 int cy = getHeight() / 2 - 40;
                 int raio = Math.min(getWidth(), getHeight()) / 3;
 
-                double[] percentuais = {40, 30, 20, 10};
-                Color[] cores = {new Color(31, 111, 235), new Color(46, 160, 67), new Color(248, 81, 73), new Color(255, 166, 0)};
-                String[] labels = {"PETR4", "VALE3", "IVVB11", "BOVA11"};
+                double[] percentuais = donutPercentuais;
+                Color[] cores = {new Color(31, 111, 235), new Color(46, 160, 67), new Color(248, 81, 73), new Color(255, 166, 0), new Color(163, 113, 247), new Color(0, 191, 165), new Color(255, 87, 34), new Color(120, 144, 156)};
+                String[] labels = donutLabels;
 
                 int startAngle = 0;
                 for (int i = 0; i < percentuais.length; i++) {
                     int arcAngle = (int) (percentuais[i] * 3.6);
-                    g2.setColor(cores[i]);
+                    g2.setColor(cores[i % cores.length]);
                     g2.fillArc(cx - raio, cy - raio, raio * 2, raio * 2, startAngle, arcAngle);
                     startAngle += arcAngle;
                 }
@@ -135,7 +220,7 @@ public class InvestorDashboardView extends javax.swing.JPanel {
                 g2.setFont(new Font("SansSerif", Font.PLAIN, 11));
                 for (int i = 0; i < labels.length; i++) {
                     int lx = 15;
-                    g2.setColor(cores[i]);
+                    g2.setColor(cores[i % cores.length]);
                     g2.fillRoundRect(lx, legendaY + i * 18, 10, 10, 3, 3);
                     g2.setColor(ThemeManager.getSubText());
                     g2.drawString(labels[i] + "  " + (int) percentuais[i] + "%", lx + 15, legendaY + i * 18 + 10);
@@ -199,7 +284,7 @@ public class InvestorDashboardView extends javax.swing.JPanel {
         };
         estilizarBotaoPrincipal(btnNovoInvestidor);
         btnNovoInvestidor.addActionListener(e -> {
-            if (controller != null) controller.backToManagerMain();
+            if (controller != null) controller.startNewInvestorRegistration();
         });
 
         pnlFooter.add(btnVoltar);
@@ -228,6 +313,13 @@ public class InvestorDashboardView extends javax.swing.JPanel {
         JLabel v = new JLabel(valor);
         v.setFont(new Font("SansSerif", Font.BOLD, 26));
         v.setForeground(corValor);
+
+        // Captura referências para atualização com dados reais
+        if (titulo.contains("Retorno")) {
+            lblRetornoEsperado = v;
+        } else {
+            lblVolatilidade = v;
+        }
 
         card.add(t, BorderLayout.NORTH);
         card.add(v, BorderLayout.CENTER);

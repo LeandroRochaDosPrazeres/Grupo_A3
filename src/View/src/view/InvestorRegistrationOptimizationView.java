@@ -2,6 +2,7 @@ package view;
 
 import util.ThemeManager;
 import controller.InvestorController;
+import model.Asset;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
@@ -31,10 +32,12 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
     private JLabel lblTitulo;
     
     private DefaultTableModel tableModel;
+    private final List<Asset> assetsNaTabela = new ArrayList<>();
 
     public InvestorRegistrationOptimizationView() {
         configurarPainel();
-        carregarAtivosMockados();
+        // ativos mockados só para preview visual isolado (sem controller)
+        // quando o controller chama loadAssetsTable(), os dados reais são carregados
     }
 
     public void setController(InvestorController controller) {
@@ -59,16 +62,28 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
         return perfilSelecionado;
     }
 
-    public List<String> getSelectedAssets() {
-        List<String> ativosSelecionados = new ArrayList<>();
+    public List<Asset> getSelectedAssets() {
+        List<Asset> selecionados = new ArrayList<>();
         for (int i = 0; i < tableModel.getRowCount(); i++) {
-            Boolean selecionado = (Boolean) tableModel.getValueAt(i, 0);
-            if (selecionado != null && selecionado) {
-                String ticker = (String) tableModel.getValueAt(i, 1);
-                ativosSelecionados.add(ticker);
+            Boolean marcado = (Boolean) tableModel.getValueAt(i, 0);
+            if (marcado != null && marcado && i < assetsNaTabela.size()) {
+                selecionados.add(assetsNaTabela.get(i));
             }
         }
-        return ativosSelecionados;
+        return selecionados;
+    }
+
+    // joga na tabela os ativos reais vindos do banco
+    // (entra no lugar dos ativos mockados quando tem Controller ligado)
+    public void loadAssetsTable(List<Asset> assets) {
+        tableModel.setRowCount(0);
+        assetsNaTabela.clear();
+        if (assets == null) return;
+        for (Asset asset : assets) {
+            assetsNaTabela.add(asset);
+            String risco = asset.getBaseRisk() != null ? asset.getBaseRisk().toString() : "—";
+            tableModel.addRow(new Object[]{false, asset.getTicker(), asset.getName(), asset.getCategory(), risco});
+        }
     }
 
     public void clearForm() {
@@ -81,11 +96,22 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
     }
 
     public void showSuccess(String message) {
-        JOptionPane.showMessageDialog(this, message, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        util.MessageUtil.showSuccess(this, message);
     }
 
     public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Erro", JOptionPane.ERROR_MESSAGE);
+        util.MessageUtil.showError(this, message);
+    }
+
+    // ----- helpers usados pelos testes automatizados (simulam o preenchimento) -----
+    public void setInvestorNameForTest(String nome) { txtInvestorName.setText(nome); }
+    public void setDocumentIdForTest(String doc) { txtDocumentId.setText(doc); }
+    public void setRiskProfileForTest(String perfilPt) { cmbRiskProfile.setSelectedItem(perfilPt); }
+    // marca os primeiros N ativos da tabela, como se o usuario clicasse nos checkboxes
+    public void selecionarAtivosParaTeste(int quantos) {
+        for (int i = 0; i < quantos && i < tableModel.getRowCount(); i++) {
+            tableModel.setValueAt(true, i, 0);
+        }
     }
 
     /**
@@ -223,14 +249,23 @@ public class InvestorRegistrationOptimizationView extends javax.swing.JPanel {
     }
 
     private void carregarAtivosMockados() {
-        tableModel.addRow(new Object[]{false, "PETR4", "Petróleo Brasileiro S.A.", "Ação", "Alto"});
-        tableModel.addRow(new Object[]{false, "VALE3", "Vale S.A.", "Ação", "Alto"});
-        tableModel.addRow(new Object[]{false, "BBDC4", "Banco Bradesco S.A.", "Ação", "Médio"});
-        tableModel.addRow(new Object[]{false, "BOVA11", "iShares Ibovespa Index ETF", "ETF", "Médio"});
-        tableModel.addRow(new Object[]{false, "TESOURO2029", "Tesouro IPCA+ 2029", "Renda Fixa", "Baixo"});
-        tableModel.addRow(new Object[]{false, "CDB_PRE", "CDB Prefixado Itaú 12%", "Renda Fixa", "Baixo"});
-        tableModel.addRow(new Object[]{false, "KNRI11", "Kinea Renda Imobiliária FII", "FII", "Baixo"});
-        tableModel.addRow(new Object[]{false, "IVVB11", "iShares S&P 500 ETF", "ETF", "Alto"});
+        adicionarAtivoMock("PETR4", "Petróleo Brasileiro S.A.", "Ação", "Alto");
+        adicionarAtivoMock("VALE3", "Vale S.A.", "Ação", "Alto");
+        adicionarAtivoMock("BBDC4", "Banco Bradesco S.A.", "Ação", "Médio");
+        adicionarAtivoMock("BOVA11", "iShares Ibovespa Index ETF", "ETF", "Médio");
+        adicionarAtivoMock("TESOURO2029", "Tesouro IPCA+ 2029", "Renda Fixa", "Baixo");
+        adicionarAtivoMock("CDB_PRE", "CDB Prefixado Itaú 12%", "Renda Fixa", "Baixo");
+        adicionarAtivoMock("KNRI11", "Kinea Renda Imobiliária FII", "FII", "Baixo");
+        adicionarAtivoMock("IVVB11", "iShares S&P 500 ETF", "ETF", "Alto");
+    }
+
+    private void adicionarAtivoMock(String ticker, String nome, String categoria, String risco) {
+        Asset asset = new Asset();
+        asset.setTicker(ticker);
+        asset.setName(nome);
+        asset.setCategory(categoria);
+        assetsNaTabela.add(asset);
+        tableModel.addRow(new Object[]{false, ticker, nome, categoria, risco});
     }
 
     private JLabel criarLabel(String texto) {

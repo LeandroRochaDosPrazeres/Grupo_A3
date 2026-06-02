@@ -1,0 +1,41 @@
+# ============================================
+# Finance Team - .gitignore
+# ============================================
+
+# --- Segredos / variaveis de ambiente ---
+# NUNCA versionar credenciais do Supabase
+.env
+**/.env
+*.env
+!*.env.example
+
+# --- Artefatos de build do NetBeans / Ant ---
+build/
+dist/
+nbbuild/
+nbdist/
+**/build/
+**/dist/
+**/nbbuild/
+.nb-gradle/
+
+# --- Arquivos compilados Java ---
+*.class
+*.jar.original
+
+# --- Configuracoes privadas do NetBeans (por maquina) ---
+**/nbproject/private/
+
+# --- macOS ---
+.DS_Store
+**/.DS_Store
+
+# --- IDEs diversas ---
+.idea/
+*.iml
+.vscode/
+*.swp
+*~
+
+# --- Logs ---
+*.log

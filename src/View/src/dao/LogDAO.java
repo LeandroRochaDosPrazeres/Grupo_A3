@@ -19,7 +19,11 @@ public class LogDAO extends SupabaseClient {
 
     public LogEntry create(LogEntry log) {
         JsonObject json = new JsonObject();
-        json.addProperty("user_id", log.getUserId());
+        if (log.getUserId() != null) {
+            json.addProperty("user_id", log.getUserId());
+        } else {
+            json.add("user_id", com.google.gson.JsonNull.INSTANCE);
+        }
         json.addProperty("action", log.getAction());
         json.addProperty("details", log.getDetails());
 

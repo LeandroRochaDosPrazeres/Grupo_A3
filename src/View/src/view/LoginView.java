@@ -43,7 +43,7 @@ public class LoginView extends javax.swing.JFrame {
     }
     
     public void showError(String m) { 
-        JOptionPane.showMessageDialog(this, m, "Erro", JOptionPane.ERROR_MESSAGE); 
+        util.MessageUtil.showError(this, m); 
     }
     
     public void closeView() { 
@@ -199,8 +199,6 @@ public class LoginView extends javax.swing.JFrame {
     }
 
     public static void main(String[] args) {
-        LoginView v = new LoginView();
-        v.setController(new LoginController(v));
-        v.showView();
+        app.Main.main(args);
     }
 }

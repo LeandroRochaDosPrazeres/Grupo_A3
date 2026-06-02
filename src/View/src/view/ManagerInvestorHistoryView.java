@@ -2,11 +2,15 @@ package view;
 
 import util.ThemeManager;
 import controller.InvestorController;
+import model.Investor;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Camada View (Swing) - ManagerInvestorHistoryView.
@@ -24,14 +28,41 @@ public class ManagerInvestorHistoryView extends javax.swing.JPanel {
     private JButton btnAtualizar;
     private JLabel lblTitulo;
     private DefaultTableModel tableModel;
+    private final List<Investor> investidoresNaTabela = new ArrayList<>();
 
     public ManagerInvestorHistoryView() {
         configurarPainel();
-        carregarHistoricoMockado();
+        // dados mockados só para preview visual isolado (sem controller)
     }
 
     public void setController(InvestorController controller) {
         this.controller = controller;
+    }
+
+    // joga na tabela os investidores reais deste gerente
+    // (entra no lugar dos dados mockados quando tem Controller ligado)
+    public void loadInvestorsTable(List<Investor> investidores) {
+        tableModel.setRowCount(0);
+        investidoresNaTabela.clear();
+        if (investidores == null) return;
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        for (Investor inv : investidores) {
+            investidoresNaTabela.add(inv);
+            String perfil = inv.getRiskProfile() != null ? inv.getRiskProfile().name() : "—";
+            String data = inv.getCreatedAt() != null ? inv.getCreatedAt().format(fmt) : "—";
+            tableModel.addRow(new Object[]{
+                    inv.getName(), inv.getDocumentId(), perfil, "—", data
+            });
+        }
+    }
+
+    // devolve o id do investidor que esta selecionado na tabela (ou null se nada)
+    public Long getSelectedInvestorId() {
+        int linha = tblInvestors.getSelectedRow();
+        if (linha != -1 && linha < investidoresNaTabela.size()) {
+            return investidoresNaTabela.get(linha).getId();
+        }
+        return null;
     }
 
     /**
@@ -46,12 +77,15 @@ public class ManagerInvestorHistoryView extends javax.swing.JPanel {
     }
 
     public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Aviso", JOptionPane.WARNING_MESSAGE);
+        util.MessageUtil.showWarning(this, message);
     }
 
     public void showSuccess(String message) {
-        JOptionPane.showMessageDialog(this, message, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        util.MessageUtil.showSuccess(this, message);
     }
+
+    // helper de teste: quantos investidores a tabela esta mostrando
+    public int getRowCountForTest() { return tableModel.getRowCount(); }
 
     /**
      * Configuração do layout e design do histórico.
@@ -78,7 +112,7 @@ public class ManagerInvestorHistoryView extends javax.swing.JPanel {
         btnAtualizar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnAtualizar.setPreferredSize(new Dimension(120, 32));
         btnAtualizar.addActionListener(e -> {
-            if (controller != null) controller.loadInvestorHistory(null);
+            if (controller != null) controller.loadInvestorHistory();
         });
         pnlHeader.add(btnAtualizar, BorderLayout.EAST);
 

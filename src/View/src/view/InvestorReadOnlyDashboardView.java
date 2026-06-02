@@ -1,11 +1,17 @@
 package view;
 
 import util.ThemeManager;
+import controller.InvestorReadOnlyController;
+import model.Optimization;
+import model.PortfolioItem;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 
 /**
  * Camada View (Swing) - InvestorReadOnlyDashboardView.
@@ -28,10 +34,20 @@ public class InvestorReadOnlyDashboardView extends javax.swing.JFrame {
     private JPanel sidebar;
     private JLabel lblLogo;
     private JLabel lblUserName;
+    private InvestorReadOnlyController controller;
+    private double[] donutPercentuais = {45, 25, 15, 10, 5};
+    private String[] donutLabels = {"TESOURO2029", "CDB_PRE", "KNRI11", "BOVA11", "BBDC4"};
+    private JPanel pnlDonut;
 
     public InvestorReadOnlyDashboardView() {
         configurarInterface();
-        carregarDadosSimulados();
+        // dados simulados apenas para preview visual isolado (sem controller)
+        // quando setController + controller.loadMyPortfolio() são chamados,
+        // os dados reais substituem tudo
+    }
+
+    public void setController(InvestorReadOnlyController controller) {
+        this.controller = controller;
     }
 
     // --- MÉTODOS CONTRATUAIS ---
@@ -55,9 +71,77 @@ public class InvestorReadOnlyDashboardView extends javax.swing.JFrame {
         lblTotalRisk.setText(value);
     }
 
-    public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Erro", JOptionPane.ERROR_MESSAGE);
+    // monta a tabela e o grafico donut com os itens otimizados da carteira
+    public void loadPortfolioItems(List<PortfolioItem> items) {
+        tableModel.setRowCount(0);
+        if (items == null || items.isEmpty()) {
+            donutPercentuais = new double[]{100};
+            donutLabels = new String[]{"—"};
+            if (pnlDonut != null) pnlDonut.repaint();
+            return;
+        }
+
+        donutPercentuais = new double[items.size()];
+        donutLabels = new String[items.size()];
+
+        for (int i = 0; i < items.size(); i++) {
+            PortfolioItem item = items.get(i);
+            String ticker = item.getAsset() != null ? item.getAsset().getTicker() : ("Ativo " + item.getAssetId());
+            String nome = item.getAsset() != null ? item.getAsset().getName() : "—";
+            String categoria = item.getAsset() != null ? item.getAsset().getCategory() : "—";
+
+            BigDecimal perc = item.getSuggestedPercentage() != null
+                    ? item.getSuggestedPercentage().multiply(BigDecimal.valueOf(100))
+                    : BigDecimal.ZERO;
+            BigDecimal valorPosicao = item.getPositionValue() != null ? item.getPositionValue() : BigDecimal.ZERO;
+
+            tableModel.addRow(new Object[]{
+                    ticker, nome, categoria,
+                    perc.setScale(1, RoundingMode.HALF_UP) + "%",
+                    "R$ " + valorPosicao.setScale(2, RoundingMode.HALF_UP)
+            });
+
+            donutLabels[i] = ticker;
+            donutPercentuais[i] = perc.doubleValue();
+        }
+        if (pnlDonut != null) pnlDonut.repaint();
     }
+
+    // atualiza os cards de retorno esperado e risco total
+    public void setOptimizationSummary(Optimization optimization) {
+        if (optimization == null) {
+            if (lblExpectedReturn != null) lblExpectedReturn.setText("—");
+            if (lblTotalRisk != null) lblTotalRisk.setText("—");
+            return;
+        }
+        if (lblExpectedReturn != null && optimization.getExpectedReturn() != null) {
+            BigDecimal ret = optimization.getExpectedReturn().multiply(BigDecimal.valueOf(100));
+            lblExpectedReturn.setText(ret.setScale(2, RoundingMode.HALF_UP) + "% a.a.");
+        }
+        if (lblTotalRisk != null && optimization.getTotalRisk() != null) {
+            BigDecimal risco = optimization.getTotalRisk().multiply(BigDecimal.valueOf(100));
+            lblTotalRisk.setText(risco.setScale(2, RoundingMode.HALF_UP) + "% a.a.");
+        }
+    }
+
+    public void showError(String message) {
+        util.MessageUtil.showError(this, message);
+    }
+
+    // mostra um aviso calmo na propria tela (sem popup de erro) quando o
+    // investidor ainda nao tem carteira otimizada pra exibir
+    public void mostrarEstadoVazio(String mensagem) {
+        tableModel.setRowCount(0);
+        donutPercentuais = new double[]{100};
+        donutLabels = new String[]{"sem dados"};
+        if (pnlDonut != null) pnlDonut.repaint();
+        if (lblExpectedReturn != null) lblExpectedReturn.setText("—");
+        if (lblTotalRisk != null) lblTotalRisk.setText("—");
+        if (lblRiskProfile != null) lblRiskProfile.setText(mensagem);
+    }
+
+    // helper de teste: quantas linhas a tabela da carteira esta mostrando
+    public int getRowCountForTest() { return tableModel.getRowCount(); }
 
     public void closeView() { this.dispose(); }
 
@@ -101,7 +185,8 @@ public class InvestorReadOnlyDashboardView extends javax.swing.JFrame {
         btnSair = criarBotaoMenu("Sair");
 
         btnSair.addActionListener(e -> {
-            System.out.println("InvestorReadOnlyDashboardView: Logout solicitado.");
+            if (controller != null) controller.logout();
+            else dispose();
         });
 
         sidebar.add(btnPortfolio);
@@ -129,7 +214,6 @@ public class InvestorReadOnlyDashboardView extends javax.swing.JFrame {
         btnTheme.addActionListener(e -> {
             ThemeManager.toggleTheme();
             configurarInterface();
-            carregarDadosSimulados();
             SwingUtilities.updateComponentTreeUI(this);
         });
 
@@ -177,7 +261,7 @@ public class InvestorReadOnlyDashboardView extends javax.swing.JFrame {
         pnlMeio.setOpaque(false);
 
         // Gráfico Donut de alocação
-        JPanel pnlDonut = new JPanel() {
+        pnlDonut = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -190,14 +274,14 @@ public class InvestorReadOnlyDashboardView extends javax.swing.JFrame {
                 int cy = getHeight() / 2 - 40;
                 int raio = Math.min(getWidth(), getHeight()) / 3;
 
-                double[] percentuais = {45, 25, 15, 10, 5};
-                Color[] cores = {new Color(31, 111, 235), new Color(46, 160, 67), new Color(255, 166, 0), new Color(248, 81, 73), new Color(163, 113, 247)};
-                String[] labels = {"TESOURO2029", "CDB_PRE", "KNRI11", "BOVA11", "BBDC4"};
+                double[] percentuais = donutPercentuais;
+                Color[] cores = {new Color(31, 111, 235), new Color(46, 160, 67), new Color(255, 166, 0), new Color(248, 81, 73), new Color(163, 113, 247), new Color(0, 191, 165), new Color(255, 87, 34), new Color(120, 144, 156)};
+                String[] labels = donutLabels;
 
                 int startAngle = 0;
                 for (int i = 0; i < percentuais.length; i++) {
                     int arcAngle = (int) (percentuais[i] * 3.6);
-                    g2.setColor(cores[i]);
+                    g2.setColor(cores[i % cores.length]);
                     g2.fillArc(cx - raio, cy - raio, raio * 2, raio * 2, startAngle, arcAngle);
                     startAngle += arcAngle;
                 }
@@ -217,7 +301,7 @@ public class InvestorReadOnlyDashboardView extends javax.swing.JFrame {
                 g2.setFont(new Font("SansSerif", Font.PLAIN, 11));
                 for (int i = 0; i < labels.length; i++) {
                     int lx = 15;
-                    g2.setColor(cores[i]);
+                    g2.setColor(cores[i % cores.length]);
                     g2.fillRoundRect(lx, legendaY + i * 18, 10, 10, 3, 3);
                     g2.setColor(ThemeManager.getSubText());
                     g2.drawString(labels[i] + "  " + (int) percentuais[i] + "%", lx + 15, legendaY + i * 18 + 10);

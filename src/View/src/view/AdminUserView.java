@@ -1,11 +1,15 @@
 package view;
 
 import util.ThemeManager;
+import controller.AdminUserController;
+import model.User;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Camada View (Swing) - AdminUserView.
@@ -29,10 +33,34 @@ public class AdminUserView extends javax.swing.JFrame {
     private DefaultTableModel tableModel;
     private JPanel sidebar;
     private JLabel lblLogo;
+    private AdminUserController controller;
 
     public AdminUserView() {
         configurarInterface();
-        carregarUsuariosMockados();
+        // dados mockados só aparecem em modo isolado (sem controller)
+        // quando o controller chama loadUsers(), a tabela é atualizada com dados reais
+    }
+
+    public void setController(AdminUserController controller) {
+        this.controller = controller;
+    }
+
+    // joga na tabela os usuarios reais vindos do banco
+    // (entra no lugar dos dados mockados quando tem Controller ligado)
+    public void loadUsersTable(List<User> users) {
+        tableModel.setRowCount(0);
+        if (users == null) return;
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        for (User u : users) {
+            String role = u.getRole() != null ? u.getRole().name() : "—";
+            String codigo = (u.getManagerCode() != null && !u.getManagerCode().isBlank())
+                    ? u.getManagerCode() : "—";
+            String ativo = u.isActive() ? "Sim" : "Não";
+            String data = u.getCreatedAt() != null ? u.getCreatedAt().format(fmt) : "—";
+            tableModel.addRow(new Object[]{
+                    u.getId(), u.getName(), u.getEmail(), role, codigo, ativo, data
+            });
+        }
     }
 
     // --- MÉTODOS OBRIGATÓRIOS DA VIEW ---
@@ -56,18 +84,15 @@ public class AdminUserView extends javax.swing.JFrame {
     }
 
     public void showSuccess(String message) {
-        JOptionPane.showMessageDialog(this, message, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        util.MessageUtil.showSuccess(this, message);
     }
 
     public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Erro", JOptionPane.ERROR_MESSAGE);
+        util.MessageUtil.showError(this, message);
     }
 
     public boolean confirmDelete() {
-        int resposta = JOptionPane.showConfirmDialog(this,
-            "Tem certeza que deseja excluir este usuário?",
-            "Confirmar Exclusão", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        return resposta == JOptionPane.YES_OPTION;
+        return util.MessageUtil.confirm(this, "Tem certeza que deseja excluir este usuário?");
     }
 
     public void closeView() {
@@ -113,13 +138,19 @@ public class AdminUserView extends javax.swing.JFrame {
         btnAtualizar = criarBotaoMenu("Atualizar Lista");
         btnSair = criarBotaoMenu("Sair");
 
-        btnNovoUsuario.addActionListener(e -> abrirFormularioNovoUsuario());
-        btnExcluirUsuario.addActionListener(e -> excluirUsuarioSelecionado());
+        btnNovoUsuario.addActionListener(e -> {
+            if (controller != null) controller.openCreateUserForm();
+            else abrirFormularioNovoUsuario();
+        });
+        btnExcluirUsuario.addActionListener(e -> {
+            if (controller != null) controller.deleteSelectedUser();
+            else excluirUsuarioSelecionado();
+        });
         btnAtualizar.addActionListener(e -> {
-            System.out.println("AdminUserView: Atualizar lista solicitado.");
+            if (controller != null) controller.loadUsers();
         });
         btnSair.addActionListener(e -> {
-            System.out.println("AdminUserView: Logout solicitado.");
+            if (controller != null) controller.logout();
         });
 
         sidebar.add(btnNovoUsuario);
@@ -151,7 +182,8 @@ public class AdminUserView extends javax.swing.JFrame {
         btnTheme.addActionListener(e -> {
             ThemeManager.toggleTheme();
             configurarInterface();
-            carregarUsuariosMockados();
+            if (controller != null) controller.loadUsers();
+            else carregarUsuariosMockados();
             SwingUtilities.updateComponentTreeUI(this);
         });
 

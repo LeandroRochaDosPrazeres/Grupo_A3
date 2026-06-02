@@ -1,6 +1,7 @@
 package view;
 
 import util.ThemeManager;
+import controller.AdminUserController;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -24,10 +25,15 @@ public class UserFormDialog extends javax.swing.JDialog {
     private JButton btnCancelar;
 
     private JLabel lblManagerCode;
+    private AdminUserController controller;
 
     public UserFormDialog(JFrame parent) {
         super(parent, "Cadastrar Novo Usuário", true);
         configurarInterface();
+    }
+
+    public void setController(AdminUserController controller) {
+        this.controller = controller;
     }
 
     // --- MÉTODOS CONTRATUAIS ---
@@ -48,10 +54,22 @@ public class UserFormDialog extends javax.swing.JDialog {
     public boolean isActive() { return chkActive.isSelected(); }
 
     public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Erro", JOptionPane.ERROR_MESSAGE);
+        util.MessageUtil.showError(this, message);
     }
 
     public void closeDialog() { this.dispose(); }
+
+    // ----- helpers usados pelos testes (simulam o preenchimento do formulario) -----
+    public void setNameForTest(String nome) { txtName.setText(nome); }
+    public void setEmailForTest(String email) { txtEmail.setText(email); }
+    public void setPasswordForTest(String senha) { txtPassword.setText(senha); }
+    public void setManagerCodeForTest(String code) { txtManagerCode.setText(code); }
+    // recebe ADMIN/MANAGER/INVESTOR e seleciona o item certo no combo
+    public void setRoleForTest(String roleEn) {
+        if ("ADMIN".equals(roleEn)) cmbRole.setSelectedItem("ADMINISTRADOR");
+        else if ("MANAGER".equals(roleEn)) cmbRole.setSelectedItem("GERENTE");
+        else if ("INVESTOR".equals(roleEn)) cmbRole.setSelectedItem("INVESTIDOR");
+    }
 
     /**
      * Configuração da interface do formulário modal.
@@ -179,13 +197,17 @@ public class UserFormDialog extends javax.swing.JDialog {
     }
 
     private void salvarUsuario() {
+        if (controller != null) {
+            controller.saveUser(this);
+            return;
+        }
+        // Fallback (modo isolado, sem Controller)
         if (getName().trim().isEmpty() || getEmail().trim().isEmpty() || getPassword().trim().isEmpty()) {
             showError("Por favor, preencha todos os campos obrigatórios (Nome, E-mail e Senha).");
             return;
         }
         System.out.println("UserFormDialog: Salvando usuário - " + getName() + " (" + getSelectedRole() + ")");
-        JOptionPane.showMessageDialog(this, "Usuário \"" + getName() + "\" cadastrado com sucesso!",
-            "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        util.MessageUtil.showSuccess(this, "Usuário \"" + getName() + "\" cadastrado com sucesso!");
         closeDialog();
     }
 
