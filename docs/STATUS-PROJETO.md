@@ -1,6 +1,15 @@
-# Status do Projeto — O que Falta Fazer
+# Status do Projeto — Finance Team
 
-> Última atualização: Maio/2025
+> Última atualização: Junho/2026  
+> **Status geral: ✅ PROJETO FINALIZADO**
+
+---
+
+## Resumo
+
+**O projeto está 100% implementado, integrado e finalizado.** Todas as camadas (Model, DAO, Service, Controller, View) estão funcionais e conectadas entre si. O sistema roda diretamente com o banco Supabase — basta ter o `.env` configurado e pressionar F6 no NetBeans.
+
+Não há pendências de implementação. As próximas alterações, se houver, serão apenas evolutivas (novas funcionalidades) e não correções de integração.
 
 ---
 
@@ -11,234 +20,108 @@
 | **Model** | Isabelly, Leandro e Maya |
 | **DAO** | João e Iuan |
 | **Service** | Maya |
-| **Controller** | Jean e Giovanni |
+| **Controller** | Jean, Giovanni e Leandro |
 | **View** | Leandro |
 
 ---
 
-## O que já está PRONTO
+## Status por Camada
 
-### Model (Isabelly, Leandro, Maya)
+### Model ✅
+
 | Classe | Status |
 |--------|--------|
-| `User.java` | ✅ Pronto (obs: arquivo contém código de Portfolio — corrigir) |
-| `UserRole.java` | ✅ Pronto (obs: arquivo contém código de Portfolio — corrigir) |
-| `Investor.java` | ✅ Pronto |
-| `RiskProfile.java` | ✅ Pronto |
-| `Asset.java` | ✅ Pronto |
-| `Portfolio.java` | ✅ Pronto |
-| `PortfolioItem.java` | ✅ Pronto |
-| `Optimization.java` | ✅ Pronto |
-| `LogEntry.java` | ✅ Pronto |
-| `PortfolioPrice.java` | ✅ Pronto |
+| `User.java` | ✅ Completo |
+| `UserRole.java` | ✅ Completo |
+| `Investor.java` | ✅ Completo |
+| `RiskProfile.java` | ✅ Completo |
+| `Asset.java` | ✅ Completo |
+| `Portfolio.java` | ✅ Completo |
+| `PortfolioItem.java` | ✅ Completo |
+| `Optimization.java` | ✅ Completo |
+| `LogEntry.java` | ✅ Completo |
+| `PortfolioPrice.java` | ✅ Completo |
 
-### Service (Maya)
+### DAO ✅
+
 | Classe | Status |
 |--------|--------|
-| `AuthService.java` | ✅ Pronto |
-| `InvestorService.java` | ✅ Pronto |
-| `PortfolioService.java` | ✅ Pronto |
-| `PortfolioOptimizerService.java` | ✅ Pronto |
+| `SupabaseClient.java` | ✅ Completo — GET, POST, PATCH, DELETE, UPSERT |
+| `UserDAO.java` | ✅ Completo — create, findByEmail, findById, findAll, update, delete |
+| `InvestorDAO.java` | ✅ Completo — create, findAll, findByManager, findById, delete |
+| `AssetDAO.java` | ✅ Completo — create, findAll, findByTicker |
+| `PortfolioDAO.java` | ✅ Completo — create, findByInvestor, findById |
+| `PortfolioItemDAO.java` | ✅ Completo — create, findByPortfolio, updateSuggestedPercentage, delete |
+| `OptimizationDAO.java` | ✅ Completo — create, findByPortfolio |
+| `LogDAO.java` | ✅ Completo — create, findRecentForUser |
+| `PortfolioPriceDAO.java` | ✅ Completo — upsertPrice, findByTicker |
 
-### View (Leandro)
+### Service ✅
+
 | Classe | Status |
 |--------|--------|
-| `LoginView.java` | ✅ Pronto |
-| `ManagerMainView.java` | ✅ Pronto |
-| `InvestorRegistrationOptimizationView.java` | ✅ Pronto |
-| `ManagerInvestorHistoryView.java` | ✅ Pronto |
-| `InvestorDashboardView.java` | ✅ Pronto |
-| `AdminUserView.java` | ✅ Pronto |
-| `UserFormDialog.java` | ✅ Pronto |
-| `InvestorReadOnlyDashboardView.java` | ✅ Pronto |
-| `AssetSelectionPanel.java` | ✅ Pronto |
-| `ThemeManager.java` | ✅ Pronto |
-| `MessageUtil.java` | ✅ Pronto |
-| `BaseFrame.java` | ✅ Pronto |
-| `UserTableModel.java` | ✅ Pronto |
-| `InvestorTableModel.java` | ✅ Pronto |
-| `AssetSelectionTableModel.java` | ✅ Pronto |
-| `PortfolioItemTableModel.java` | ✅ Pronto |
+| `AuthService.java` | ✅ Completo — login com validação e log de auditoria |
+| `InvestorService.java` | ✅ Completo — createInvestor, getInvestorById, deleteInvestor, findByManager |
+| `PortfolioService.java` | ✅ Completo — createPortfolio, addItem, removeItem, loadPortfolioWithItems |
+| `PortfolioOptimizerService.java` | ✅ Completo — motor de otimização por perfil de risco (CONSERVATIVE/MODERATE/AGGRESSIVE) |
 
-### Controller (Jean, Giovanni) — parcialmente feito
+### Controller ✅
+
 | Classe | Status |
 |--------|--------|
-| `LoginController.java` | ⚠️ Esqueleto pronto (falta integrar com AuthService real) |
-| `ManagerController.java` | ⚠️ Esqueleto pronto (falta integrar com Services) |
-| `InvestorController.java` | ⚠️ Esqueleto pronto (falta integrar com Services) |
+| `LoginController.java` | ✅ Completo — autentica e redireciona por perfil (Admin/Manager/Investor) |
+| `AdminUserController.java` | ✅ Completo — CRUD de usuários |
+| `ManagerController.java` | ✅ Completo — navegação entre telas do Gerente |
+| `InvestorController.java` | ✅ Completo — cadastro, otimização, histórico e dashboard |
+| `InvestorReadOnlyController.java` | ✅ Completo — carrega carteira do investidor logado |
+
+### View ✅
+
+| Classe | Jornada | Status |
+|--------|---------|--------|
+| `LoginView.java` | Comum | ✅ Completo |
+| `AdminUserView.java` | Administrador | ✅ Completo |
+| `UserFormDialog.java` | Administrador | ✅ Completo |
+| `ManagerMainView.java` | Gerente | ✅ Completo |
+| `InvestorRegistrationOptimizationView.java` | Gerente | ✅ Completo |
+| `InvestorDashboardView.java` | Gerente | ✅ Completo |
+| `ManagerInvestorHistoryView.java` | Gerente | ✅ Completo |
+| `InvestorReadOnlyDashboardView.java` | Investidor | ✅ Completo |
+
+### Utilitários ✅
+
+| Classe | Status |
+|--------|--------|
+| `ThemeManager.java` | ✅ Completo — Dark/Light mode + estilização de tabelas, combos e scroll |
+| `MessageUtil.java` | ✅ Completo — showSuccess, showError, showWarning, confirm |
+| `BaseFrame.java` | ✅ Completo — classe base para JFrames |
+| `AppContext.java` | ✅ Completo — injeção de dependências (DAOs + Services) |
 
 ---
 
-## O que FALTA fazer
-
-### 1. DAO — João e Iuan
-
-**Nenhum DAO foi implementado ainda.** Todos precisam ser criados do zero.
-
-| Classe | Prioridade | O que fazer |
-|--------|-----------|-------------|
-| `SupabaseClient.java` | ALTA | Classe base com métodos `get()`, `post()`, `patch()`, `deleteById()`. Todos os DAOs dependem dela. |
-| `UserDAO.java` | ALTA | `create()`, `findByEmail()`, `findById()`, `update()`, `delete()` |
-| `InvestorDAO.java` | ALTA | `create()`, `findAll()`, `findByManager()`, `findById()`, `delete()` |
-| `AssetDAO.java` | MÉDIA | `create()`, `findAll()`, `findByTicker()` |
-| `PortfolioDAO.java` | ALTA | `create()`, `findByInvestor()`, `findById()` |
-| `PortfolioItemDAO.java` | ALTA | `create()`, `findByPortfolio()`, `updateSuggestedPercentage()`, `delete()` |
-| `OptimizationDAO.java` | MÉDIA | `create()`, `findByPortfolio()` |
-| `LogDAO.java` | MÉDIA | `create()`, `findRecentForUser()` |
-| `PortfolioPriceDAO.java` | BAIXA | `upsertPrice()`, `findByTicker()` (opcional na V1) |
-
-**Como começar:**
-1. Criar `SupabaseClient.java` primeiro (é a base de tudo)
-2. Depois `UserDAO.java` (para testar login)
-3. Depois `InvestorDAO.java` e `PortfolioDAO.java`
-
-**Referência:** Ver seção 2 do `definicao-clases-novo.md` para detalhes de cada método.
-
----
-
-### 2. Controller — Jean e Giovanni
-
-Os controllers existem mas estão com **lógica mockada** (só prints no console). Precisam ser integrados com os Services reais.
-
-| Classe | O que falta |
-|--------|------------|
-| `LoginController.java` | Integrar com `AuthService` real. Após login, abrir a tela correta (Admin/Manager/Investor) |
-| `ManagerController.java` | Receber `User loggedUser` e `InvestorController` com Services reais |
-| `InvestorController.java` | Integrar com `InvestorService`, `PortfolioService`, `PortfolioOptimizerService` |
-| `AdminUserController.java` | **CRIAR DO ZERO** — CRUD de usuários usando `UserDAO` |
-| `PortfolioController.java` | **CRIAR** (opcional) — operações extras sobre carteiras |
-
-**Como começar:**
-1. Esperar os DAOs ficarem prontos (João e Iuan)
-2. Atualizar `LoginController` para usar `AuthService` real
-3. Criar `AdminUserController`
-4. Atualizar `InvestorController` para usar os Services
-
----
-
-### 3. Model — Isabelly, Leandro, Maya
-
-**PROBLEMA ENCONTRADO:** Os arquivos `User.java` e `UserRole.java` contêm o código da classe `Portfolio` em vez do conteúdo correto. Precisam ser corrigidos.
-
-| Classe | O que falta |
-|--------|------------|
-| `User.java` | **CORRIGIR** — o arquivo contém código de Portfolio. Precisa ter a classe User com atributos: id, name, email, passwordHash, role, managerCode, active, createdAt |
-| `UserRole.java` | **CORRIGIR** — o arquivo contém código de Portfolio. Precisa ter o enum: ADMIN, MANAGER, INVESTOR |
-
-**Código correto do User.java:**
-```java
-package model;
-
-import java.time.OffsetDateTime;
-
-public class User {
-    private Long id;
-    private String name;
-    private String email;
-    private String passwordHash;
-    private UserRole role;
-    private String managerCode;
-    private boolean active;
-    private OffsetDateTime createdAt;
-
-    // Getters e Setters de todos os campos...
-
-    public boolean isAdmin() { return role == UserRole.ADMIN; }
-    public boolean isManager() { return role == UserRole.MANAGER; }
-    public boolean isInvestor() { return role == UserRole.INVESTOR; }
-
-    public boolean checkPassword(String plainPassword) {
-        // Na V1, comparação simples (depois trocar por BCrypt)
-        return passwordHash != null && passwordHash.equals(plainPassword);
-    }
-
-    public String toString() { return name + " (" + email + ")"; }
-}
-```
-
-**Código correto do UserRole.java:**
-```java
-package model;
-
-public enum UserRole {
-    ADMIN,
-    MANAGER,
-    INVESTOR
-}
-```
-
----
-
-### 4. Integração Final (TODOS)
-
-Depois que cada camada estiver pronta individualmente, a integração final:
-
-| Tarefa | Responsável | Depende de |
-|--------|------------|-----------|
-| Corrigir `User.java` e `UserRole.java` | Isabelly/Leandro/Maya | — |
-| Criar `SupabaseClient` + todos os DAOs | João e Iuan | Model corrigido |
-| Integrar Controllers com Services reais | Jean e Giovanni | DAOs prontos |
-| Testar fluxo completo de Login | TODOS | Tudo acima |
-| Testar fluxo Cadastrar + Otimizar | TODOS | Tudo acima |
-| Testar fluxo Admin (CRUD usuários) | TODOS | Tudo acima |
-
----
-
-## Ordem de Execução Recomendada
+## Fluxo Completo Integrado
 
 ```
-SEMANA 1:
-├── [Isabelly/Leandro/Maya] Corrigir User.java e UserRole.java
-├── [João/Iuan] Criar SupabaseClient.java
-└── [João/Iuan] Criar UserDAO.java
-
-SEMANA 2:
-├── [João/Iuan] Criar InvestorDAO, PortfolioDAO, PortfolioItemDAO
-├── [João/Iuan] Criar AssetDAO, OptimizationDAO, LogDAO
-└── [Jean/Giovanni] Integrar LoginController com AuthService + UserDAO
-
-SEMANA 3:
-├── [Jean/Giovanni] Criar AdminUserController
-├── [Jean/Giovanni] Integrar InvestorController com Services
-└── [TODOS] Testar fluxos completos
+app.Main
+  └── AppContext
+       ├── DAOs (conectados ao Supabase via .env)
+       └── Services (recebem os DAOs)
+            └── LoginView + LoginController
+                 ├── ADMIN
+                 │    └── AdminUserView + AdminUserController
+                 │         └── UserDAO (list/create/delete usuários)
+                 ├── MANAGER
+                 │    └── ManagerMainView + ManagerController
+                 │         ├── InvestorRegistrationOptimizationView
+                 │         │    └── InvestorController.registerAndOptimize()
+                 │         │         ├── InvestorService.createInvestor()
+                 │         │         ├── PortfolioService.createPortfolio()
+                 │         │         ├── PortfolioService.addItem() (por ativo)
+                 │         │         ├── PortfolioOptimizerService.optimizePortfolio()
+                 │         │         └── InvestorDashboardView (resultado)
+                 │         └── ManagerInvestorHistoryView
+                 │              └── InvestorController.openSelectedInvestorDashboard()
+                 └── INVESTOR
+                      └── InvestorReadOnlyDashboardView
+                           └── InvestorReadOnlyController.loadMyPortfolio()
 ```
-
----
-
-## Configuração do Supabase
-
-Para os DAOs funcionarem, vocês precisam:
-
-1. **URL do projeto:** `https://SEU-ID.supabase.co/rest/v1`
-2. **API Key:** encontrada em Settings → API → `anon public`
-3. **Tabelas já criadas:** ver arquivo `src/model/db.sql`
-
-Coloquem essas informações em variáveis de ambiente ou em um arquivo de configuração (NÃO committem a API key no GitHub).
-
----
-
-## Resumo Visual
-
-```
-                    ┌─────────────────────────────────┐
-                    │         PRONTO ✅                │
-                    │  Model, Service, View            │
-                    └─────────────────────────────────┘
-                                    │
-                    ┌─────────────────────────────────┐
-                    │      FALTA FAZER ❌              │
-                    │  DAO (João/Iuan)                 │
-                    │  Controller integrado (Jean/Gio) │
-                    │  Corrigir User.java (Isabelly)   │
-                    └─────────────────────────────────┘
-                                    │
-                    ┌─────────────────────────────────┐
-                    │      INTEGRAÇÃO FINAL 🔗         │
-                    │  Conectar tudo e testar          │
-                    │  (TODOS juntos)                  │
-                    └─────────────────────────────────┘
-```
-
----
-
-*Documento criado para o grupo Finance Team — Projeto A3*
