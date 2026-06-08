@@ -1,12 +1,10 @@
----
-
 # Finance Team — Sistema de Otimização de Portfólios
 
 > **Projeto acadêmico A3** — Universidade São Judas Tadeu (USJT)
 > Disciplina: Programação de Soluções Computacionais
 > Professora: Cristiane
 
----
+
 
 ## Descrição
 
