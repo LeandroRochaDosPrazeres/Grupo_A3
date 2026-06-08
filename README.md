@@ -6,6 +6,9 @@
 > **Status: ✅ Projeto finalizado — todas as camadas implementadas e integradas**
 
 ---
+OBS: Os testes automatizados foram realizados na branch main do GitHub.
+---
+
 
 ## Descrição
 
