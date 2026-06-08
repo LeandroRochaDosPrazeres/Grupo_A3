@@ -2,7 +2,8 @@
 
 > **Projeto acadêmico A3** — Universidade São Judas Tadeu (USJT)  
 > Disciplina: Programação de Soluções Computacionais  
-> Professora: Cristiane
+> Professora: Cristiane  
+> **Status: ✅ Projeto finalizado — todas as camadas implementadas e integradas**
 
 ---
 

@@ -1,12 +1,15 @@
 # Status do Projeto — Finance Team
 
-> Última atualização: Junho/2025
+> Última atualização: Junho/2026  
+> **Status geral: ✅ PROJETO FINALIZADO**
 
 ---
 
 ## Resumo
 
-**O projeto está 100% implementado e integrado.** Todas as camadas (Model, DAO, Service, Controller, View) estão funcionais e conectadas entre si. O sistema roda diretamente com o banco Supabase — basta ter o `.env` configurado e pressionar F6 no NetBeans.
+**O projeto está 100% implementado, integrado e finalizado.** Todas as camadas (Model, DAO, Service, Controller, View) estão funcionais e conectadas entre si. O sistema roda diretamente com o banco Supabase — basta ter o `.env` configurado e pressionar F6 no NetBeans.
+
+Não há pendências de implementação. As próximas alterações, se houver, serão apenas evolutivas (novas funcionalidades) e não correções de integração.
 
 ---
 
