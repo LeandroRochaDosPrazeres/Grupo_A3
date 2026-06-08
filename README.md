@@ -1,41 +1,44 @@
+---
+
 # Finance Team — Sistema de Otimização de Portfólios
 
-> **Projeto acadêmico A3** — Universidade São Judas Tadeu (USJT)  
-> Disciplina: Programação de Soluções Computacionais  
+> **Projeto acadêmico A3** — Universidade São Judas Tadeu (USJT)
+> Disciplina: Programação de Soluções Computacionais
 > Professora: Cristiane
 
 ---
 
 ## Descrição
 
-Sistema desktop em **Java Swing** para gestão e otimização de carteiras de investimentos. Permite que gerentes cadastrem investidores, selecionem ativos e executem um motor de otimização simplificado que sugere a alocação percentual ideal com base no perfil de risco.
+Sistema desktop em **Java Swing** para gestão e otimização de carteiras de investimentos. O sistema é totalmente integrado a um banco de dados em nuvem, permitindo o controle de acessos por níveis de permissão (Admin, Gerente e Investidor), cadastro completo de clientes e ativos, além de contar com um motor de otimização funcional que sugere a alocação percentual ideal com base no perfil de risco do investidor.
 
 ---
 
 ## Arquitetura
 
-O projeto segue o padrão **MVC + Service + DAO**:
+O projeto foi desenvolvido seguindo o padrão arquitetural **MVC + Service + DAO**, garantindo a separação de responsabilidades e facilidade de manutenção:
 
 ```
 ┌─────────┐     ┌────────────┐     ┌─────────┐     ┌─────┐     ┌──────────┐
 │  View   │ ──▶ │ Controller │ ──▶ │ Service │ ──▶ │ DAO │ ──▶ │ Supabase │
 │ (Swing) │     │            │     │ (regras)│     │(HTTP)│     │(Postgres)│
 └─────────┘     └────────────┘     └─────────┘     └─────┘     └──────────┘
-                                         ▲
-                                         │
-                                    ┌─────────┐
-                                    │  Model  │
-                                    │ (POJOs) │
-                                    └─────────┘
+                                        ▲
+                                        │
+                                   ┌─────────┐
+                                   │  Model  │
+                                   │ (POJOs) │
+                                   └─────────┘
+
 ```
 
 | Camada | Responsabilidade |
-|--------|-----------------|
-| **View** | Telas Swing (JFrame/JPanel) — coleta dados e exibe resultados |
-| **Controller** | Coordena fluxo entre View, Service e DAO |
-| **Service** | Regras de negócio (autenticação, otimização, logging) |
-| **DAO** | Acesso a dados via REST HTTP ao Supabase (HttpClient + Gson) |
-| **Model** | Entidades de domínio (POJOs espelhando tabelas do banco) |
+| --- | --- |
+| **View** | Telas Swing (JFrame/JPanel) — interação com o usuário, coleta de dados e exibição de resultados. |
+| **Controller** | Intermediário direto; coordena o fluxo de dados entre a View e a camada de Serviço. |
+| **Service** | Centraliza as regras de negócio, validações de segurança, motor de otimização e geração de logs. |
+| **DAO** | Gerencia a persistência de dados consumindo a API REST do Supabase via HTTPClient e transformando JSONs com Gson. |
+| **Model** | Entidades de domínio (POJOs) puras que espelham a estrutura das tabelas do banco de dados. |
 
 ---
 
@@ -45,151 +48,129 @@ O projeto segue o padrão **MVC + Service + DAO**:
 src/
 ├── model/                          # Camada Model (entidades de domínio)
 │   ├── Asset.java                  # Ativo financeiro (ticker, nome, categoria, risco)
-│   ├── LogEntry.java               # Registro de log de ações
-│   ├── Optimization.java           # Resultado de uma execução de otimização
+│   ├── LogEntry.java               # Registro de log de auditoria
+│   ├── Optimization.java           # Resultado de uma execução do motor de otimização
 │   ├── Portfolio.java              # Carteira de investimentos
 │   ├── PortfolioItem.java          # Item da carteira (ativo + quantidade + preço)
 │   ├── PortfolioPrice.java         # Preço histórico por ticker/data
 │   ├── RiskProfile.java            # Enum: CONSERVATIVE, MODERATE, AGGRESSIVE
-│   ├── User.java                   # Usuário do sistema (*)
-│   ├── UserRole.java               # Enum de papéis (*)
-│   └── db.sql                      # Schema do banco (Supabase/PostgreSQL)
+│   ├── User.java                   # Usuário do sistema (Credenciais e Perfil)
+│   └── UserRole.java               # Enum de papéis (ADMIN, MANAGER, INVESTOR)
 │
-└── View/                           # Projeto NetBeans (camadas View + Controller)
+└── View/                           # Projeto NetBeans (Camadas View, Controller, Service e DAO)
     └── src/
         ├── controller/
         │   ├── LoginController.java
         │   ├── ManagerController.java
-        │   └── InvestorController.java
+        │   ├── InvestorController.java
+        │   └── AdminController.java
+        ├── service/                # Regras de negócio e motor de otimização
+        │   ├── AuthService.java
+        │   ├── InvestorService.java
+        │   └── PortfolioOptimizerService.java
+        ├── dao/                    # Integração HTTP com o Supabase
+        │   ├── SupabaseClient.java
+        │   ├── UserDAO.java
+        │   ├── InvestorDAO.java
+        │   └── PortfolioDAO.java
         ├── view/
         │   ├── LoginView.java
         │   ├── ManagerMainView.java
         │   ├── InvestorRegistrationOptimizationView.java
         │   ├── InvestorDashboardView.java
         │   ├── ManagerInvestorHistoryView.java
-        │   ├── View.java           # Main class (placeholder)
+        │   ├── AdminUserView.java
+        │   ├── UserFormDialog.java
+        │   ├── InvestorReadOnlyDashboardView.java
         │   └── resources/
         │       ├── logo_sem_background_darkmode.png
         │       └── logo_sem_background_lightmode.png
         └── util/
             └── ThemeManager.java   # Gerenciador de temas (dark/light mode)
-```
 
-> (*) Os arquivos `User.java` e `UserRole.java` atualmente contêm o código da classe `Portfolio` por engano — precisam ser corrigidos.
+```
 
 ---
 
 ## Status de Implementação
 
-### ✅ Camada Model — Completa
+O projeto foi **100% concluído**, com todas as camadas integradas e funcionais, abandonando o uso de dados mockados em prol do banco de dados em produção.
 
-| Classe | Status | Observação |
-|--------|--------|------------|
-| `Asset` | ✅ Implementada | Getters/setters + `getDisplayName()` |
-| `Portfolio` | ✅ Implementada | Inclui `getTotalValue()`, `addItem()`, `removeItem()` |
-| `PortfolioItem` | ✅ Implementada | Inclui `getPositionValue()` |
-| `Optimization` | ✅ Implementada | Construtores + `toString()` |
-| `LogEntry` | ✅ Implementada | Construtores + `toString()` |
-| `PortfolioPrice` | ✅ Implementada | Construtores + `toString()` |
-| `RiskProfile` | ✅ Implementada | Enum com 3 valores |
-| `User` | ⚠️ Conteúdo incorreto | Arquivo contém código de `Portfolio` |
-| `UserRole` | ⚠️ Conteúdo incorreto | Arquivo contém código de `Portfolio` |
+### ✅ Camadas de Core & Dados (Model, DAO e Service)
 
-### ✅ Camada View — Implementada (com dados mockados)
+| Componente | Status | Descrição |
+| --- | --- | --- |
+| **Model** | ✅ Concluído | Todas as entidades mapeadas corretamente (incluindo correções de `User` e `UserRole`). |
+| **SupabaseClient** | ✅ Concluído | Centraliza a comunicação HTTP, tratamento de headers de autenticação e requisições REST. |
+| **DAOs Específicos** | ✅ Concluído | `UserDAO`, `InvestorDAO`, `PortfolioDAO`, etc., realizando operações completas no banco. |
+| **AuthService** | ✅ Concluído | Regras de autenticação, validação de hash de senha e controle de sessão ativa. |
+| **PortfolioOptimizerService** | ✅ Concluído | Motor de otimização baseado no perfil de risco (`RiskProfile`), calculando as alocações ideais de forma automatizada. |
 
-| Tela | Status | Descrição |
-|------|--------|-----------|
-| `LoginView` | ✅ Funcional | Login com email/senha, logo dinâmico, tema dark/light |
-| `ManagerMainView` | ✅ Funcional | Sidebar com navegação, painel dinâmico central |
-| `InvestorRegistrationOptimizationView` | ✅ Funcional | Formulário + tabela de ativos com checkbox |
-| `InvestorDashboardView` | ✅ Funcional | Cards de retorno/risco + tabela de alocação |
-| `ManagerInvestorHistoryView` | ✅ Funcional | Tabela de investidores + botão visualizar carteira |
+### ✅ Camada de Interface (View & Controller)
 
-### ✅ Camada Controller — Implementada (navegação funcional)
-
-| Controller | Status | Descrição |
-|------------|--------|-----------|
-| `LoginController` | ✅ Parcial | Valida campos vazios; falta integração com AuthService |
-| `ManagerController` | ✅ Funcional | Navegação entre telas do gerente |
-| `InvestorController` | ✅ Parcial | Navegação OK; falta lógica de persistência e otimização |
-
-### ✅ Utilitários
-
-| Classe | Status | Descrição |
-|--------|--------|-----------|
-| `ThemeManager` | ✅ Funcional | Dark/Light mode com paleta institucional (azul) |
-
-### ❌ Camadas Pendentes
-
-| Camada | Status |
-|--------|--------|
-| **DAO** (SupabaseClient, UserDAO, InvestorDAO, etc.) | ❌ Não iniciada |
-| **Service** (AuthService, InvestorService, PortfolioOptimizerService) | ❌ Não iniciada |
-| Jornada do **Administrador** (AdminUserView, UserFormDialog) | ❌ Não iniciada |
-| Jornada do **Investidor** (InvestorReadOnlyDashboardView) | ❌ Não iniciada |
+| Tela / Fluxo | Status | Descrição |
+| --- | --- | --- |
+| `LoginView` & Controller | ✅ Concluído | Autenticação real contra o Supabase, carregamento dinâmico de permissões e tema visual adaptativo. |
+| **Jornada do Gerente** | ✅ Concluído | Cadastro de investidores, seleção dinâmica de ativos ativos no banco, execução do motor de otimização e histórico de carteiras. |
+| **Jornada do Administrador** | ✅ Concluído | Gestão completa (CRUD) de usuários do sistema através da `AdminUserView` e `UserFormDialog`. |
+| **Jornada do Investidor** | ✅ Concluído | Acesso exclusivo via `InvestorReadOnlyDashboardView` para visualização em tempo real de gráficos e cards de rentabilidade/risco de seu portfólio. |
+| `ThemeManager` | ✅ Concluído | Alternância fluida entre Dark e Light mode preservando a identidade visual azul institucional. |
 
 ---
 
 ## Funcionalidades por Perfil
 
-| Perfil | Funcionalidades |
-|--------|----------------|
-| **ADMIN** | CRUD de usuários do sistema |
-| **MANAGER** | Cadastro de investidores, seleção de ativos, otimização de portfólio, histórico |
-| **INVESTOR** | Visualização somente leitura da carteira otimizada |
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                                 PERFIS                                  │
+├───────────────────┬──────────────────────────────┬──────────────────────┤
+│       ADMIN       │           MANAGER            │       INVESTOR       │
+├───────────────────┼──────────────────────────────┼──────────────────────┤
+│ • Gestão Total de │ • Cadastrar Investidores     │ • Visualizar Painel  │
+│   Usuários        │ • Selecionar Ativos          │   de Investimentos   │
+│ • Auditoria de    │ • Rodar Motor Otimização     │ • Acesso em Modo     │
+│   Logs do Sistema │ • Histórico de Carteiras     │   Somente Leitura    │
+└───────────────────┴──────────────────────────────┴──────────────────────┘
+
+```
 
 ---
 
-## Tecnologias
+## Tecnologias Utilizadas
 
-| Tecnologia | Uso |
-|------------|-----|
-| Java 17+ | Linguagem principal |
-| Java Swing | Interface gráfica desktop |
-| NetBeans IDE | Construção do projeto View |
-| Supabase (PostgreSQL) | Banco de dados na nuvem |
-| REST API (HttpClient) | Comunicação com o Supabase |
-| Gson | Serialização/deserialização JSON |
+* **Java 17+**: Linguagem base do ecossistema do projeto.
+* **Java Swing**: Construção de interfaces gráficas desktop robustas.
+* **NetBeans IDE**: IDE utilizada para o design visual das telas e organização modular.
+* **Supabase (PostgreSQL)**: Banco de dados relacional hospedado na nuvem, fornecendo persistência segura.
+* **HttpClient (Java Native)**: Consumo da API RESTful do Supabase sem dependências pesadas de terceiros.
+* **Gson (Google)**: Manipulação, serialização e desserialização de objetos Java para formato JSON.
 
 ---
 
 ## Como Executar
 
-1. Abrir o projeto `src/View` no **NetBeans IDE**
-2. Executar a classe `view.LoginView` (contém `main`)
-3. A aplicação inicia na tela de login com tema escuro
-
-> **Nota:** Atualmente a aplicação funciona com dados mockados. A integração com o Supabase será implementada na camada DAO.
+1. Certifique-se de ter o **Java 17 (ou superior)** instalado em sua máquina.
+2. Certifique-se de que as credenciais e a URL de conexão do Supabase estejam configuradas corretamente no arquivo de propriedades ou na classe `SupabaseClient`.
+3. Abra o projeto contido na pasta `src/View` utilizando o **NetBeans IDE**.
+4. Limpe e construa o projeto (`Clean and Build`).
+5. Execute a classe `view.LoginView` (que contém o método `main`).
+6. Insira suas credenciais de acesso para iniciar a navegação de acordo com o nível do seu perfil.
 
 ---
 
 ## Banco de Dados
 
-O schema completo está em `src/model/db.sql`. Tabelas:
+O banco de dados PostgreSQL é gerenciado remotamente pelo Supabase. O script DDL com a estrutura das tabelas, chaves estrangeiras e triggers de logs encontra-se mapeado em `src/model/db.sql`, englobando as estruturas de:
 
-- `users` — Usuários internos (ADMIN, MANAGER)
-- `investors` — Investidores cadastrados pelos gerentes
-- `assets` — Ativos financeiros disponíveis
-- `portfolios` — Carteiras de investimento
-- `portfolio_items` — Composição das carteiras (ativo + quantidade + preço)
-- `optimizations` — Registros de execuções do motor de otimização
-- `portfolio_prices` — Preços históricos (para cálculos futuros)
-- `logs` — Auditoria de ações do sistema
-
----
-
-## Próximos Passos
-
-1. **Corrigir** `User.java` e `UserRole.java` (estão com conteúdo duplicado de Portfolio)
-2. **Implementar** camada DAO com `SupabaseClient` e DAOs específicos
-3. **Implementar** camada Service (AuthService, InvestorService, PortfolioOptimizerService)
-4. **Integrar** Controllers com Services/DAOs (substituir dados mockados)
-5. **Implementar** jornada do Administrador (AdminUserView + UserFormDialog)
-6. **Implementar** jornada do Investidor (tela somente leitura)
-7. **Implementar** motor de otimização simplificado
+* `users` (Credenciais, tokens e papéis do sistema)
+* `investors` (Dados cadastrais dos clientes finais)
+* `assets` (Listagem global de ativos do mercado)
+* `portfolios` & `portfolio_items` (Estrutura e amarração de carteiras de investimentos)
+* `optimizations` (Histórico de execuções de cálculos do motor)
+* `logs` (Trilha de auditoria das ações críticas do sistema)
 
 ---
 
 ## Equipe
 
-Projeto desenvolvido pelo grupo da disciplina de Programação de Soluções Computacionais — USJT 2025.
+Projeto desenvolvido com sucesso pelo grupo da disciplina de Programação de Soluções Computacionais — **Universidade São Judas Tadeu (USJT)**.
